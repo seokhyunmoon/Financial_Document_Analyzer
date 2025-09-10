@@ -1,5 +1,8 @@
 __pycache__/
 .venv/
 .vscode/
-api_key.json
+data/
 etc/
+
+api_key.json
+2410.01039v1.pdf

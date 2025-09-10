@@ -1,6 +1,0 @@
-pip install -U langchain langgraph langsmith
-pip install -U "langchain[google-genai]"
-
-pip install langchain-community
-
-pip install ipython

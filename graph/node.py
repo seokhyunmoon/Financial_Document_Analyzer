@@ -3,8 +3,6 @@ from typing import List
 from langchain_core.documents import Document
 from langchain_core.messages import SystemMessage, HumanMessage
 
-# 네가 만든 상태 타입을 그대로 사용 (이름만 별칭)
-# 기존: from graph.state import StateGraph as RAGState  (혼란 유발)
 from graph.state import RAGState
 
 
@@ -24,7 +22,6 @@ def _format_ctx(docs: List[Document]) -> str:
 def retrieve_node(state: RAGState) -> dict:
     """질문으로 상위 k개 문서 검색 → docs 반환"""
     retriever = get_retriever(k=5)
-    # docs = retriever.get_relevant_documents(state["question"])  # ← 경고 유발
     docs = retriever.invoke(state["question"])  # ← 권장 API
     return {"docs": docs}
 

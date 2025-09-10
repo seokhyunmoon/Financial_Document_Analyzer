@@ -13,7 +13,7 @@ from ingest.loader import load_docs
 from ingest.splitter import split_docs
 from ingest.index import add_chunks, reset_index, index_status
 
-g = StateGraph(RAGState)   # ✅ 이제 정확히 TypedDict를 전달
+g = StateGraph(RAGState) 
 g.add_node("retrieve", retrieve_node)
 g.add_node("generate", generate_node)
 g.add_edge(START, "retrieve")
