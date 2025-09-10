@@ -4,5 +4,6 @@ __pycache__/
 data/
 etc/
 
+.gitignore
 api_key.json
 2410.01039v1.pdf
