@@ -21,15 +21,13 @@ def load_docs(file_paths: List[str]) -> List[Document]:
             loader = PyMuPDFLoader(file_path)
         elif path.suffix.lower() == '.txt':
             loader = TextLoader(file_path, encoding='utf8')
+        elif path.suffix.lower() == '.md':
+            loader = TextLoader(file_path, encoding='utf8')
         else:
             print(f"Unsupported file type: {file_path}.")
             continue
         
         docs = loader.load()
-        
-        
-        # for d in docs:
-        
         
         all_docs.extend(docs)
     
