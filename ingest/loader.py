@@ -1,12 +1,12 @@
 from typing import List
 import pathlib
 from langchain_core.documents import Document
-from langchain_community.document_loaders import PyMuPDFLoader, TextLoader
+from langchain_community.document_loaders import TextLoader
 
 def load_docs(file_paths: List[str]) -> List[Document]:
     """
     Load documents from the given file paths.
-    Supports PDF and TXT files.
+    Supports MD and TXT files.
     """
     
     all_docs : List[Document] = []
@@ -17,9 +17,7 @@ def load_docs(file_paths: List[str]) -> List[Document]:
             print(f"File {file_path} does not exist.")
             continue
         
-        if path.suffix.lower() == '.pdf':
-            loader = PyMuPDFLoader(file_path)
-        elif path.suffix.lower() == '.txt':
+        if path.suffix.lower() == '.txt':
             loader = TextLoader(file_path, encoding='utf8')
         elif path.suffix.lower() == '.md':
             loader = TextLoader(file_path, encoding='utf8')
