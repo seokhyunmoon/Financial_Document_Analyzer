@@ -4,6 +4,6 @@ __pycache__/
 data/
 indexes/
 
-.gitignore
+test.py
 api_key.json
 2410.01039v1.pdf
