@@ -6,8 +6,8 @@ from configs.config_loader import load_config, get
 
 config = load_config()
 
-_CHUNK_SIZE = get(config, "retrieval", "chunking", "chunk_size", default=10000)
-_CHUNK_OVERLAP = get(config, "retrieval", "chunking", "chunk_overlap", default=10000)
+_CHUNK_SIZE = get(config, "retrieval", "chunking", "chunk_size", default=1000)
+_CHUNK_OVERLAP = get(config, "retrieval", "chunking", "chunk_overlap", default=150)
 _RESET_PER_DOC = get(config, "retrieval", "chunking", "reset_chunk_id_per_doc", default=True)
 
 def recursive_chunking(docs: List[Document], 
