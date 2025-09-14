@@ -2,6 +2,6 @@
 retrieval:
   chunking:
     chunk_strategy: md_recursive
-    chunk_size: 1800        
-    chunk_overlap: 300
-    reset_chunk_id_per_doc: true
+    chunk_size: 1000
+    chunk_overlap: 150
+    reset_chunk_id_per_doc: True
