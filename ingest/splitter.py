@@ -1,7 +1,9 @@
 from typing import List, Tuple
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, MarkdownHeaderTextSplitter
+from langchain_experimental.text_splitter import SemanticChunker
 
+from ingest.embedder import get_embeddings
 from configs.config_loader import load_config, get
 
 config = load_config()
@@ -130,5 +132,51 @@ def md_recursive_chunking(docs: List[Document],
     return chunks
 
 #Semantic chunking
+# Semantic chunking
+def semantic_chunking(
+    docs: List[Document],
+    breakpoint_type: str = "percentile",          # "percentile" | "standard_deviation"
+    breakpoint_threshold: float = 0.95,           # e.g., 0.95 for percentile, or 1.0 for std-dev
+    reset_chunk_id_per_doc: bool = _RESET_PER_DOC
+) -> List[Document]:
+    """
+    Split documents using semantic boundaries based on embedding similarity.
 
+    - breakpoint_type:
+        * "percentile": split when distance > percentile(breakpoint_threshold)
+        * "standard_deviation": split when distance > mean + k*std (k = breakpoint_threshold)
+    - breakpoint_threshold:
+        * for "percentile": 0~1 (e.g., 0.95)
+        * for "standard_deviation": positive float (e.g., 1.0)
 
+    Returns:
+        List[Document]: semantically chunked documents with chunk_id assigned.
+    """
+    # 1) build chunker
+    chunker = SemanticChunker(
+        embeddings=get_embeddings(),
+        breakpoint_type=breakpoint_type,
+        breakpoint_threshold=breakpoint_threshold,
+    )
+
+    # 2) split
+    chunks: List[Document] = chunker.split_documents(docs)
+
+    # 3) assign chunk_id
+    if reset_chunk_id_per_doc:
+        by_source = {}
+        for ch in chunks:
+            src = (ch.metadata or {}).get("source")
+            by_source.setdefault(src, 0)
+            by_source[src] += 1
+            m = dict(ch.metadata or {})
+            m["chunk_id"] = by_source[src]
+            ch.metadata = m
+    else:
+        for i, ch in enumerate(chunks, start=1):
+            m = dict(ch.metadata or {})
+            m["chunk_id"] = i
+            ch.metadata = m
+
+    return chunks
+    
