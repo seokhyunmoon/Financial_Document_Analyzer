@@ -10,7 +10,7 @@ from graph.node import retrieve_node, generate_node
 
 # Indexing Utils
 from ingest.loader import load_docs
-from ingest.splitter import recursive_chunking
+from ingest.splitter import recursive_chunking as split_docs
 from ingest.index import add_chunks, reset_index, index_status
 
 g = StateGraph(RAGState) 
@@ -34,7 +34,7 @@ with gr.Blocks(title="Mini LangGraph RAG (Gemini Free)") as demo:
                     return "업로드된 파일이 없습니다."
                 paths = [f.name for f in fs]
                 raw_docs = load_docs(paths)
-                chunks = recursive_chunking(raw_docs, chunk_size=1000, chunk_overlap=150, reset_chunk_id_per_doc=True)
+                chunks = split_docs(raw_docs, chunk_size=1000, chunk_overlap=150, reset_chunk_id_per_doc=True)
                 n = add_chunks(chunks)
                 return f"인덱싱 완료: {n} chunks"
 
