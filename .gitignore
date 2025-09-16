@@ -3,6 +3,9 @@ __pycache__/
 .vscode/
 data/
 indexes/
+.gemini/
+
+ACM_ICAIF/
 
 test.py
 api_key.json
