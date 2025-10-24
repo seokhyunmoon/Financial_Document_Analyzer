@@ -1,12 +1,6 @@
+
 __pycache__/
 .venv/
 .vscode/
 data/
-indexes/
-.gemini/
-
-ACM_ICAIF/
-
-test.py
-api_key.json
-2410.01039v1.pdf
+papers/
