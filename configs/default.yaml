@@ -1,0 +1,14 @@
+topk: 10
+chunk:
+  min_chars: 2048
+  boundary:
+    title: true
+    table: true
+limits:
+  context_tokens_budget: 3000
+paths:
+  raw_dir: data/raw
+  elements_dir: data/processed/elements
+  chunks_dir: data/processed/chunks
+  index_dense_dir: data/index/dense
+  logs_dir: data/logs
