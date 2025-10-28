@@ -50,7 +50,7 @@ def main() -> None:
     pdf_path, doc_id = ensure_pdf(args.inp)
     elements = extract_elements(pdf_path, doc_id)
 
-    out_path = elements_dir / f"{doc_id}.elements.jsonl"
+    out_path = elements_dir / f"{doc_id}_elements.jsonl"
     write_jsonl(str(out_path), elements)
 
     print(f"[OK] Elements written: {out_path}")
