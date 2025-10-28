@@ -1,6 +1,8 @@
-
-__pycache__/
 .venv/
-data/
+__pycache__/
+*.pyc
+.env
+data/index/
+data/cache/
+data/logs/
 papers/
-
