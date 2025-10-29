@@ -1,14 +1,36 @@
 topk: 10
+
 chunk:
   min_chars: 2048
   boundary:
     title: true
     table: true
+
 limits:
   context_tokens_budget: 3000
+
 paths:
   raw_dir: data/raw
   elements_dir: data/processed/elements
   chunks_dir: data/processed/chunks
   index_dense_dir: data/index/dense
   logs_dir: data/logs
+
+unstructured:
+  strategy: hi_res
+  hi_res_model: yolox #detectron2_onnx
+  include_page_breaks: false
+  languages:
+    - eng
+  infer_table_structure: true
+  store_bbox: false
+
+cleaning:
+  apply_unicode_quotes: true
+  apply_clean: true
+  clean_options:
+    bullets: true
+    extra_whitespace: true
+    dashes: true
+    trailing_punctuation: false
+    lowercase: false
