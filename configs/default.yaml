@@ -16,7 +16,7 @@ paths:
   index_dense_dir: data/index/dense
   logs_dir: data/logs
 
-unstructured:
+partitioning:
   strategy: hi_res
   hi_res_model: yolox #detectron2_onnx
   include_page_breaks: false
