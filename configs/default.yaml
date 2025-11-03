@@ -1,13 +1,13 @@
 topk: 10
 
+limits:
+  context_tokens_budget: 3000
+  
 chunk:
   min_chars: 2048
   boundary:
     title: true
     table: true
-
-limits:
-  context_tokens_budget: 3000
 
 paths:
   raw_dir: data/raw
@@ -34,3 +34,15 @@ cleaning:
     dashes: true
     trailing_punctuation: false
     lowercase: false
+
+embedding:
+  model_name: Qwen/Qwen3-Embedding-4B
+  provider: sentence-transformers
+  batch_size: 8
+  normalize_embeddings: true
+  vector_dimension: 2560
+
+weaviate:
+  host: http://localhost:8080
+  grpc_port: 50051
+  collection_name: FinancialDocChunk
