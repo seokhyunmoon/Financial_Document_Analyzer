@@ -20,7 +20,7 @@ from typing import List, Dict, Any
 # Adjust path so we can import from src
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from graph.nodes.elements import extract_elements
+from graph.nodes._elements import extract_elements
 
 
 def write_jsonl(output_path: str, records: List[Dict[str, Any]]) -> None:

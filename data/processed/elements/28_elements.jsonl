@@ -1,14 +1,560 @@
-{"doc_id": "28", "type": "text", "text": "Table of Contents", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "title", "text": "PART II", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "title", "text": "Item 5. Market for Registrant’s Common Equity, Related Stockholder Matters and Issuer Purchases of Equity Securities.", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "Stock Trading Symbol PEP.", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "Stock Exchange Listings The Nasdaq Global Select Market is the principal market for our common stock, which is also listed on the SIX Swiss Exchange.", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "Shareholders As of February 2, 2023, there were approximately 98,573 shareholders of record of our common stock.", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "Dividends We have paid consecutive quarterly cash dividends since 1965. The declaration and payment of future dividends are at the discretion of the Board. Dividends are usually declared in February, May, July and November and paid at the end of March, June and September and the beginning of January. On February 1, 2023, the Board declared a quarterly dividend of $1.15 per share payable March 31, 2023, to shareholders of record on March 3, 2023. For the remainder of 2023, the record dates for these dividend payments are expected to be June 2, September 1 and December 1, 2023, subject to the approval of the Board. On February 9, 2023, we announced a 10.0% increase in our annualized dividend to $5.06 per share from $4.60 per share, effective with the dividend expected to be paid in June 2023. We expect to return a total of approximately $7.7 billion to shareholders in 2023, comprising dividends of approximately $6.7 billion and share repurchases of approximately $1.0 billion.", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "For information on securities authorized for issuance under our equity compensation plans, see “Item 12. Security Ownership of Certain Beneficial Owners and Management and Related Stockholder Matters.”", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "A summary of our common stock repurchases (in millions, except average price per share) during the fourth quarter of 2022 is set", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "forth in the table below.", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "title", "text": "Issuer Purchases of Common Stock", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "table", "text": "Total Number of Maximum Number (or Total Shares Purchased as Approximate Dollar Value) of Period Number of Shares Repurchased (a) Average Price Paid Per Share Part of Publicly Announced Plans or Programs Shares that May Yet Be Purchased Under the Plans or Programs 9/3/2022 $ 8,821 9/4/2022 10/1/2022 0.9 $ 168.54 0.9 (153) 8,668 10/2/2022 10/29/2022 0.2 $ 174.47 0.2 (46) 8,622 10/30/2022 11/26/2022 0.4 $ 179.94 0.4 (67) 8,555 11/27/2022 12/31/2022 0.3 $ 182.84 0.3 (55) Total 1.8 $ 174.04 1.8 $ 8,500", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "(a) All shares were repurchased in open market transactions pursuant to the $10 billion repurchase program authorized by our Board and publicly announced on February 10, 2022, which commenced on February 11, 2022 and will expire on February 28, 2026. Shares repurchased under this program may be repurchased in open market transactions, in privately negotiated transactions, in accelerated stock repurchase transactions or otherwise.", "page": 1, "bbox": null, "caption": null}
-{"doc_id": "28", "type": "text", "text": "28", "page": 1, "bbox": null, "caption": null}
+[
+    {
+        "element_id": "19942901f0449150e419eba6b94bf264",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        22.3
+                    ],
+                    [
+                        45.6,
+                        47.3
+                    ],
+                    [
+                        224.4,
+                        47.3
+                    ],
+                    [
+                        224.4,
+                        22.3
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.8882,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1
+        },
+        "text": "Table of Contents",
+        "type": "Header"
+    },
+    {
+        "element_id": "e1f769686f9023608a71289a302e3b67",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        767.6,
+                        130.9
+                    ],
+                    [
+                        767.6,
+                        160.9
+                    ],
+                    [
+                        883.4,
+                        160.9
+                    ],
+                    [
+                        883.4,
+                        130.9
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.75032,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "19942901f0449150e419eba6b94bf264"
+        },
+        "text": "PART II",
+        "type": "Title"
+    },
+    {
+        "element_id": "9bc7ffedf390a1ab1e1733fbe2a09616",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        43.4,
+                        181.5
+                    ],
+                    [
+                        43.4,
+                        212.0
+                    ],
+                    [
+                        1597.1,
+                        212.0
+                    ],
+                    [
+                        1597.1,
+                        181.5
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.71418,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "19942901f0449150e419eba6b94bf264"
+        },
+        "text": "Item 5. Market for Registrant\u2019s Common Equity, Related Stockholder Matters and Issuer Purchases of Equity Securities.",
+        "type": "Title"
+    },
+    {
+        "element_id": "6bc3730e130ce737cc0c0f89902305cc",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        230.1
+                    ],
+                    [
+                        45.6,
+                        262.4
+                    ],
+                    [
+                        403.6,
+                        262.4
+                    ],
+                    [
+                        403.6,
+                        230.1
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.75221,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "9bc7ffedf390a1ab1e1733fbe2a09616"
+        },
+        "text": "Stock Trading Symbol PEP.",
+        "type": "NarrativeText"
+    },
+    {
+        "element_id": "90765bad8dba605b4f74275f2a807cde",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        284.7
+                    ],
+                    [
+                        45.6,
+                        350.3
+                    ],
+                    [
+                        1604.1,
+                        350.3
+                    ],
+                    [
+                        1604.1,
+                        284.7
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.90916,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "9bc7ffedf390a1ab1e1733fbe2a09616"
+        },
+        "text": "Stock Exchange Listings The Nasdaq Global Select Market is the principal market for our common stock, which is also listed on the SIX Swiss Exchange.",
+        "type": "NarrativeText"
+    },
+    {
+        "element_id": "e716025fd8f3810f70203e7b1a80ae1e",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        370.9
+                    ],
+                    [
+                        45.6,
+                        400.9
+                    ],
+                    [
+                        1469.3,
+                        400.9
+                    ],
+                    [
+                        1469.3,
+                        370.9
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.85835,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "9bc7ffedf390a1ab1e1733fbe2a09616"
+        },
+        "text": "Shareholders As of February 2, 2023, there were approximately 98,573 shareholders of record of our common stock.",
+        "type": "NarrativeText"
+    },
+    {
+        "element_id": "be86fca23d8a4bbff950443d36e8809e",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        421.1
+                    ],
+                    [
+                        45.6,
+                        702.8
+                    ],
+                    [
+                        1607.2,
+                        702.8
+                    ],
+                    [
+                        1607.2,
+                        421.1
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.95211,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "9bc7ffedf390a1ab1e1733fbe2a09616"
+        },
+        "text": "Dividends We have paid consecutive quarterly cash dividends since 1965. The declaration and payment of future dividends are at the discretion of the Board. Dividends are usually declared in February, May, July and November and paid at the end of March, June and September and the beginning of January. On February 1, 2023, the Board declared a quarterly dividend of $1.15 per share payable March 31, 2023, to shareholders of record on March 3, 2023. For the remainder of 2023, the record dates for these dividend payments are expected to be June 2, September 1 and December 1, 2023, subject to the approval of the Board. On February 9, 2023, we announced a 10.0% increase in our annualized dividend to $5.06 per share from $4.60 per share, effective with the dividend expected to be paid in June 2023. We expect to return a total of approximately $7.7 billion to shareholders in 2023, comprising dividends of approximately $6.7 billion and share repurchases of approximately $1.0 billion.",
+        "type": "NarrativeText"
+    },
+    {
+        "element_id": "2000e0bfa5af24532eeaa043fa6230e7",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        725.3
+                    ],
+                    [
+                        45.6,
+                        790.9
+                    ],
+                    [
+                        1604.9,
+                        790.9
+                    ],
+                    [
+                        1604.9,
+                        725.3
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.91648,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "9bc7ffedf390a1ab1e1733fbe2a09616"
+        },
+        "text": "For information on securities authorized for issuance under our equity compensation plans, see \u201cItem 12. Security Ownership of Certain Beneficial Owners and Management and Related Stockholder Matters.\u201d",
+        "type": "NarrativeText"
+    },
+    {
+        "element_id": "0b2792a29f5c7197fbf7c683233bbdc5",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        819.0
+                    ],
+                    [
+                        45.6,
+                        877.4
+                    ],
+                    [
+                        1605.0,
+                        877.4
+                    ],
+                    [
+                        1605.0,
+                        819.0
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.90769,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "9bc7ffedf390a1ab1e1733fbe2a09616"
+        },
+        "text": "A summary of our common stock repurchases (in millions, except average price per share) during the fourth quarter of 2022 is set",
+        "type": "NarrativeText"
+    },
+    {
+        "element_id": "b4c3d6c433af40f706e13ae31f2907d6",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        854.7
+                    ],
+                    [
+                        45.6,
+                        884.7
+                    ],
+                    [
+                        331.0,
+                        884.7
+                    ],
+                    [
+                        331.0,
+                        854.7
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "9bc7ffedf390a1ab1e1733fbe2a09616"
+        },
+        "text": "forth in the table below.",
+        "type": "UncategorizedText"
+    },
+    {
+        "element_id": "1392fe1bdf9f7100fc5a11bcc0370850",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        597.6,
+                        897.8
+                    ],
+                    [
+                        597.6,
+                        927.8
+                    ],
+                    [
+                        1054.5,
+                        927.8
+                    ],
+                    [
+                        1054.5,
+                        897.8
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.61868,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "19942901f0449150e419eba6b94bf264"
+        },
+        "text": "Issuer Purchases of Common Stock",
+        "type": "Title"
+    },
+    {
+        "element_id": "b7b8ecc4c102ccf0653f425c3ca53509",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        43.6,
+                        957.9
+                    ],
+                    [
+                        43.6,
+                        1461.2
+                    ],
+                    [
+                        1602.4,
+                        1461.2
+                    ],
+                    [
+                        1602.4,
+                        957.9
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.94164,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "1392fe1bdf9f7100fc5a11bcc0370850",
+            "text_as_html": "<table><thead><tr><th rowspan=\"2\">Period 9/3/2022</th><th rowspan=\"2\">Total Number of Shares Repurchased\u00ae</th><th>Average Price Paid Per Share</th><th></th><th colspan=\"2\" rowspan=\"2\">Shares Purchased as Part of Publicly Announced Plans or Programs $</th><th rowspan=\"2\">(or Approximate Dollar Value) of Shares that May Yet Be Purchased Under the Plans or Programs 8,821</th></tr><tr><th></th><th></th></tr></thead><tbody><tr><td>9/4/2022 - 10/1/2022</td><td>0.9</td><td>168.54</td><td></td><td></td><td>0.9</td><td>(153)</td></tr><tr><td colspan=\"7\">8,668</td></tr><tr><td>10/2/2022 - 10/29/2022</td><td>0.2</td><td>174.47</td><td></td><td></td><td>0.2</td><td>(46)</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td>8,622</td></tr><tr><td>10/30/2022 - 11/26/2022</td><td>0.4</td><td>179.94</td><td></td><td></td><td>0.4</td><td>(67)</td></tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td>8,555</td></tr><tr><td>11/27/2022 - 12/31/2022</td><td>0.3</td><td>182.84</td><td></td><td></td><td>0.3</td><td>(55)</td></tr><tr><td>Total</td><td>1.8</td><td>174.04</td><td></td><td></td><td>18 $</td><td>8,500</td></tr></tbody></table>"
+        },
+        "text": "Total Number of Maximum Number (or Total Shares Purchased as Approximate Dollar Value) of Period Number of Shares Repurchased (a) Average Price Paid Per Share Part of Publicly Announced Plans or Programs Shares that May Yet Be Purchased Under the Plans or Programs 9/3/2022 $ 8,821 9/4/2022 10/1/2022 0.9 $ 168.54 0.9 (153) 8,668 10/2/2022 10/29/2022 0.2 $ 174.47 0.2 (46) 8,622 10/30/2022 11/26/2022 0.4 $ 179.94 0.4 (67) 8,555 11/27/2022 12/31/2022 0.3 $ 182.84 0.3 (55) Total 1.8 $ 174.04 1.8 $ 8,500",
+        "type": "Table"
+    },
+    {
+        "element_id": "0578af3658f700d6af22ca3b036d80c3",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        45.6,
+                        1481.1
+                    ],
+                    [
+                        45.6,
+                        1596.1
+                    ],
+                    [
+                        1605.4,
+                        1596.1
+                    ],
+                    [
+                        1605.4,
+                        1481.1
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.83176,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1,
+            "parent_id": "1392fe1bdf9f7100fc5a11bcc0370850"
+        },
+        "text": "(a) All shares were repurchased in open market transactions pursuant to the $10 billion repurchase program authorized by our Board and publicly announced on February 10, 2022, which commenced on February 11, 2022 and will expire on February 28, 2026. Shares repurchased under this program may be repurchased in open market transactions, in privately negotiated transactions, in accelerated stock repurchase transactions or otherwise.",
+        "type": "ListItem"
+    },
+    {
+        "element_id": "9a5c9f6910bb9f5a89c6b24a6e385ffc",
+        "metadata": {
+            "coordinates": {
+                "layout_height": 2339,
+                "layout_width": 1653,
+                "points": [
+                    [
+                        811.4,
+                        1678.0
+                    ],
+                    [
+                        811.4,
+                        1703.0
+                    ],
+                    [
+                        838.0,
+                        1703.0
+                    ],
+                    [
+                        838.0,
+                        1678.0
+                    ]
+                ],
+                "system": "PixelSpace"
+            },
+            "detection_class_prob": 0.8348,
+            "file_directory": "data/raw",
+            "filename": "28",
+            "filetype": "application/pdf",
+            "languages": [
+                "eng"
+            ],
+            "last_modified": "2025-10-28T23:53:58",
+            "page_number": 1
+        },
+        "text": "28",
+        "type": "Footer"
+    }
+]
