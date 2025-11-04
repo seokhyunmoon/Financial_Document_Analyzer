@@ -3,32 +3,22 @@
 import sys
 import jsonlines
 from pathlib import Path
-import argparse
 
 # Adjust path so we can import from src
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from graph.nodes.chunks import merge_elements_to_chunks
+from graph.nodes._chunks import merge_elements_to_chunks
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Step2: Merge elements into chunks")
-    parser.add_argument("--in", dest="input_file", required=True, help="Path to elements JSONL file")
-    args = parser.parse_args()
 
-    input_path = Path(args.input_file)
-    if not input_path.is_file():
-        raise FileNotFoundError(f"Input file not found: {input_path}")
+    input_path = Path("data/processed/elements/28_elements.jsonl")
 
-    doc_id = input_path.stem.replace("_elements", "")
-    output_path = Path(f"data/processed/chunks/{doc_id}_chunks.jsonl")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path = Path(f"data/processed/chunks/28_chunks.jsonl")
 
-    print(f"[INFO] Loading elements from: {input_path}")
     with jsonlines.open(input_path, "r") as reader:
         elements = list(reader)
 
-    print(f"[INFO] Merging {len(elements)} elements → chunks...")
     chunks = merge_elements_to_chunks(elements)
 
     print(f"[INFO] Writing {len(chunks)} chunks to {output_path}")
