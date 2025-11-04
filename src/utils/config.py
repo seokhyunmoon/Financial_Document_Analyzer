@@ -61,15 +61,3 @@ def resolve_path(config: Dict[str, Any], *keys) -> Path:
     if not isinstance(sub, str):
         raise ValueError(f"Invalid path key: {'/'.join(keys)}")
     return Path(sub).expanduser().resolve()
-
-
-def print_summary(config: Dict[str, Any]) -> None:
-    """
-    Print a short summary of key config sections for debugging.
-    """
-    print("=== CONFIG SUMMARY ===")
-    print(f"TopK: {config.get('topk', 10)}")
-    print(f"Chunk min_chars: {config.get('chunk', {}).get('min_chars', 'N/A')}")
-    print(f"Embedding model: {config.get('embedding', {}).get('model_name', 'N/A')}")
-    print(f"Weaviate host: {config.get('weaviate', {}).get('host', 'N/A')}")
-    print("=======================")
