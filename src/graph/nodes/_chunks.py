@@ -1,100 +1,63 @@
 # src/graph/nodes/chunks.py
+"""
+chunks.py
+----------
+Hybrid Structural Chunking module based on §3.4 of the paper (2402.05131v3)
+and Unstructured's Element object model.
 
-from typing import List, Dict, Any
-from tqdm import tqdm
+This version preserves Element metadata while forming semantically coherent
+chunks separated by structural boundaries (titles, tables, page changes).
+"""
 
+from typing import List
+from unstructured.documents.elements import Element, CompositeElement
+from unstructured.chunking.title import chunk_by_title
+from utils.logger import get_logger
+from utils.config import load_config, get_section
 
-def merge_elements_to_chunks(
-    elements: List[Dict[str, Any]],
-    min_chars: int = 2048,
-    boundary_types: List[str] = ["title", "table"],
-) -> List[Dict[str, Any]]:
+logger = get_logger(__name__)
+
+def chunk_elements(elements: List[Element]) -> List[Element]:
     """
-    Description:
-        Merge extracted elements into structural chunks following the paper's §3.4 rules (papers/2402.05131v3.pdf).
+    Chunk Element objects following structural boundaries defined in §3.4:
+      - Titles always start new chunks.
+      - Tables are standalone chunks.
+      - Page changes trigger chunk split.
+      - Text accumulates until min_chars threshold is reached.
 
     Args:
-        elements (List[Dict[str, Any]]): List of elements from Unstructured (sorted by page and order).
-        min_chars (int): Minimum length before splitting into a new chunk.
-        boundary_types (List[str]): Types that start a new chunk (e.g., title, table).
+        elements (List[Element]): List of Elements extracted from PDF.
 
     Returns:
-        List[Dict[str, Any]]: List of merged chunk dictionaries with metadata.
+        List[Element]: List of CompositeElements (chunked sections).
     """
+    cfg = load_config()
+    csec = get_section(cfg, "chunking")
 
-    chunks: List[Dict[str, Any]] = []
-    current_chunk: List[Dict[str, Any]] = []
-    current_length: int = 0
-    chunk_id: int = 1
+    min_chars   = int(csec.get("min_chars", 2048))
+    max_chars   = int(csec.get("max_chars", 4096))
+    overlap     = int(csec.get("overlap", 128))
+    combine_n   = min(int(csec.get("combine_under_n_chars", min_chars)), max_chars)
 
-    for i, el in enumerate(tqdm(elements, desc="Merging elements")):
-        el_type = el.get("type", "text")
+    logger.info(f"[INFO] Chunking {len(elements)} elements (min_chars={min_chars}, max_chars={max_chars}) ...")
 
-        # boundary: title or table → close previous chunk
-        if el_type in boundary_types:
-            if current_chunk:
-                merged_text = " ".join(e["text"].strip() for e in current_chunk if e.get("text"))
-                chunks.append({
-                    "source_doc": el.get("source_doc"),
-                    "doc_id": el.get("doc_id"),
-                    "chunk_id": chunk_id,
-                    "type": "text",
-                    "text": merged_text.strip(),
-                    "page_start": current_chunk[0]["page"],
-                    "page_end": current_chunk[-1]["page"],
-                    "source_elements": [j for j in range(i - len(current_chunk), i)],
-                })
-                chunk_id += 1
-                current_chunk = []
-                current_length = 0
+    chunks: List[Element] = chunk_by_title(
+        elements=elements,
+        max_characters=max_chars,
+        combine_text_under_n_chars=combine_n,
+        new_after_n_chars=min_chars,
+        overlap=overlap,
+        include_orig_elements=False,    
+    )
 
-            # Add boundary element (title/table) as its own chunk
-            chunks.append({
-                "source_doc": el.get("source_doc"),
-                "doc_id": el.get("doc_id"),
-                "chunk_id": chunk_id,
-                "type": el_type,
-                "text": el.get("text", "").strip(),
-                "page_start": el.get("page"),
-                "page_end": el.get("page"),
-                "source_elements": [i],
-            })
-            chunk_id += 1
+    for ch in chunks:
+        md = getattr(ch, "metadata", None)
+        if md is None:
             continue
+        if hasattr(md, "orig_elements"):
+            md.orig_elements = None
+        if hasattr(md, "detection_class_prob"):
+            md.detection_class_prob = None
 
-        # text element merging
-        current_chunk.append(el)
-        current_length += len(el.get("text", ""))
-
-        # if enough length reached → finalize chunk
-        if current_length >= min_chars:
-            merged_text = " ".join(e["text"].strip() for e in current_chunk if e.get("text"))
-            chunks.append({
-                "source_doc": el.get("source_doc"),
-                "doc_id": el.get("doc_id"),
-                "chunk_id": chunk_id,
-                "type": "text",
-                "text": merged_text.strip(),
-                "page_start": current_chunk[0]["page"],
-                "page_end": current_chunk[-1]["page"],
-                "source_elements": [j for j in range(i - len(current_chunk) + 1, i + 1)],
-            })
-            chunk_id += 1
-            current_chunk = []
-            current_length = 0
-
-    # finalize remaining chunk
-    if current_chunk:
-        merged_text = " ".join(e["text"].strip() for e in current_chunk if e.get("text"))
-        chunks.append({
-            "source_doc": el.get("source_doc"),
-            "doc_id": el.get("doc_id"),
-            "chunk_id": chunk_id,
-            "type": "text",
-            "text": merged_text.strip(),
-            "page_start": current_chunk[0]["page"],
-            "page_end": current_chunk[-1]["page"],
-            "source_elements": [len(elements) - len(current_chunk) + j for j in range(len(current_chunk))],
-        })
-
+    logger.info(f"[OK] Generated {len(chunks)} chunks from {len(elements)} elements")
     return chunks
