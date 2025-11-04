@@ -1,9 +1,9 @@
 # scripts/step0_2_test_elements_native.py
-import sys
+import sys, json
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from graph.nodes.elements import extract_elements, save_elements_jsonl
+from graph.nodes._elements import extract_elements
 
 def main():
     pdf_path = Path("data/raw/28.pdf")
@@ -11,14 +11,14 @@ def main():
     out_path = Path("data/processed/elements/") / f"{doc_id}_elements.jsonl"
 
     elements = extract_elements(str(pdf_path), doc_id)
-    save_elements_jsonl(elements, out_path)
 
-    # show first 3 elements (category + text preview)
-    print("\n=== Sample Output ===")
-    for el in elements[:3]:
-        cat = getattr(el, "category", "unknown")
-        txt = (el.text[:100] + "...") if len(el.text) > 100 else el.text
-        print(f"[{cat}] {txt}")
+    # --- save as JSONL ---
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("w", encoding="utf-8") as f:
+        for row in elements:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    print(f"Wrote {len(elements)} elements → {out_path}")
 
 if __name__ == "__main__":
     main()

@@ -44,63 +44,7 @@ def _map_unstructured_category(category: Optional[str]) -> str:
         return "title"
     if c == "table":
         return "table"
-    if c == "pagebreak":
-        return "pagebreak"
     return "text"
-
-def _serialize_coordinates(metadata: Any) -> Optional[Dict[str, Any]]:
-    """
-    Description:
-        Extract layout coordinates from Unstructured element metadata and convert
-        into a normalized dictionary when available.
-
-    Args:
-        metadata (Any): Element metadata object (may contain coordinates).
-
-    Returns:
-        Optional[Dict[str, Any]]: Normalized coordinate dict, or None if not available.
-    """
-    if metadata is None:
-        return None
-    coordinates = getattr(metadata, "coordinates", None)
-    if not coordinates:
-        return None
-    if hasattr(coordinates, "to_dict"):
-        coord_dict = coordinates.to_dict()
-    elif isinstance(coordinates, dict):
-        coord_dict = dict(coordinates)
-    else:
-        coord_dict = {
-            key: getattr(coordinates, key)
-            for key in ("points", "system", "layout_width", "layout_height")
-            if hasattr(coordinates, key)
-        }
-    points = coord_dict.get("points")
-    if not points:
-        return None
-
-    normalized_points = []
-    for point in points:
-        if isinstance(point, dict):
-            x = point.get("x")
-            y = point.get("y")
-        elif isinstance(point, (list, tuple)) and len(point) == 2:
-            x, y = point
-        else:
-            continue
-        try:
-            x_f = float(x)
-            y_f = float(y)
-        except (TypeError, ValueError):
-            continue
-        normalized_points.append([x_f, y_f])
-
-    if not normalized_points:
-        return None
-
-    coord_out = dict(coord_dict)
-    coord_out["points"] = normalized_points
-    return coord_out
 
 def _load_config() -> Dict[str, Any]:
     """
@@ -149,19 +93,15 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
         filename=doc_path,
         strategy=ucfg.get("strategy", "hi_res"),
         hi_res_model_name=ucfg.get("hi_res_model", "yolox"),
-        include_page_breaks=ucfg.get("include_page_breaks", False),
         languages=ucfg.get("languages", ["eng"]),
         infer_table_structure=ucfg.get("infer_table_structure", True),
     )
 
     out: List[Dict[str, Any]] = []
-    store_bbox = ucfg.get("store_bbox", False)
 
     for el in elements:
         t_raw = getattr(el, "category", None)
         t = _map_unstructured_category(t_raw)
-        if t == "pagebreak":
-            continue
 
         text_raw = getattr(el, "text", "") or ""
         text_norm = _norm_text(text_raw)
@@ -188,18 +128,13 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
         meta = getattr(el, "metadata", None)
         page = meta.page_number if (meta and hasattr(meta, "page_number")) else None
 
-        caption: Optional[str] = None
-        if t == "table":
-            caption = None  # placeholder, future improvement
-
         out.append(
             {
-                "doc_id": doc_id,
+                "source_doc": doc_id,
+                "doc_id": f"{doc_id}_p{page}" if page is not None else doc_id,
                 "type": t if t in ("title", "table") else "text",
                 "text": text_clean,
                 "page": page,
-                "bbox": _serialize_coordinates(meta) if store_bbox else None,
-                "caption": caption,
             }
         )
 
