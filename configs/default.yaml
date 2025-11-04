@@ -39,7 +39,10 @@ embedding:
   normalize_embeddings: true
   vector_dimension: 2560
 
-weaviate:
-  host: http://localhost:8080
+vectordb:
+  host: localhost
+  port: 8080
   grpc_port: 50051
-  collection_name: FinancialDocChunk
+  skip_init_checks: true
+  use_server_embeddings: false
+  model_name: null
