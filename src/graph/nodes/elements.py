@@ -91,7 +91,7 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Element]:
 
 def save_elements_jsonl(elements: List[Element], output_path: Path) -> None:
     """
-    Save native Element objects to a JSONL file using Unstructured's staging API.
+    Save Element objects to a JSONL file using Unstructured's staging API.
 
     Args:
         elements (List[Element]): List of Unstructured Elements.
