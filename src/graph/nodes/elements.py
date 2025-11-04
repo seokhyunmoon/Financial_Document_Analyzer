@@ -1,12 +1,12 @@
 from typing import List, Dict, Any, Optional
 import re
-from pathlib import Path
-import yaml
-
 from unstructured.partition.pdf import partition_pdf
-from unstructured.cleaners.core import replace_unicode_quotes, clean  # cleaning functions
+from unstructured.cleaners.core import replace_unicode_quotes, clean 
+from utils.logger import get_logger
+from utils.config import load_config, get_section
 
-# ----------------------- Helpers -----------------------
+logger = get_logger(__name__)
+
 
 _WS_RE = re.compile(r"\s+")
 
@@ -46,21 +46,6 @@ def _map_unstructured_category(category: Optional[str]) -> str:
         return "table"
     return "text"
 
-def _load_config() -> Dict[str, Any]:
-    """
-    Description:
-        Load default.yaml configuration and return as dict.
-
-    Returns:
-        Dict[str, Any]: Parsed configuration.
-    """
-    cfg_path = Path("configs/default.yaml")
-    with cfg_path.open("r", encoding="utf-8") as f:
-        cfg = yaml.safe_load(f)
-    return cfg
-
-# ----------------------- Main extractor -----------------------
-
 def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
     """
     Description:
@@ -83,9 +68,9 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
               "page": int | None,
             }
     """
-    cfg = _load_config()
-    ucfg = cfg.get("unstructured", {})
-    cleaning_cfg = cfg.get("cleaning", {})
+    cfg = load_config()
+    ucfg = get_section(cfg, "unstructured")
+    cleaning_cfg = get_section(cfg, "cleaning")
 
     # Extract elements using configured options
     elements = partition_pdf(
@@ -139,4 +124,5 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
 
     # Ensure deterministic order by page number
     out.sort(key=lambda r: (r.get("page") or 0))
+    logger.info(f"[INFO] Extracted {len(out)} elements from {doc_path}")
     return out

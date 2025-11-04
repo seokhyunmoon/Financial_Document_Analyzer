@@ -28,10 +28,10 @@ cleaning:
     lowercase: false
 
 chunking:
-  min_chars: 512
-  max_chars: 2048
-  overlap: 64
-  combine_under_n_chars: 512
+  min_chars: 2048
+  boundary_types:
+    - title
+    - table
 
 embedding:
   model_name: Qwen/Qwen3-Embedding-4B

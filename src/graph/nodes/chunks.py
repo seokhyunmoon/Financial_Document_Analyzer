@@ -2,12 +2,14 @@
 
 from typing import List, Dict, Any
 from tqdm import tqdm
+from utils.logger import get_logger
+from utils.config import load_config, get_section
+
+logger = get_logger(__name__)
 
 
 def merge_elements_to_chunks(
     elements: List[Dict[str, Any]],
-    min_chars: int = 2048,
-    boundary_types: List[str] = ["title", "table"],
 ) -> List[Dict[str, Any]]:
     """
     Description:
@@ -22,6 +24,13 @@ def merge_elements_to_chunks(
         List[Dict[str, Any]]: List of merged chunk dictionaries with metadata.
     """
 
+    # load configuration
+    cfg = load_config()
+    csec = get_section(cfg, "chunking")
+    min_chars = int(csec.get("min_chars", 2048))
+    boundary_types = csec.get("boundary_types", boundary_types)
+    
+    # merging logic
     chunks: List[Dict[str, Any]] = []
     current_chunk: List[Dict[str, Any]] = []
     current_length: int = 0
@@ -97,4 +106,5 @@ def merge_elements_to_chunks(
             "source_elements": [len(elements) - len(current_chunk) + j for j in range(len(current_chunk))],
         })
 
+    logger.info(f"[INFO] Merged into {len(chunks)} chunks from {len(elements)} elements")
     return chunks
