@@ -1,9 +1,9 @@
-# src/graph/nodes/index_dense.py
+# src/graph/nodes/embed.py
 """
-index_dense.py
---------------
-Generate dense embeddings for document chunks using Hugging Face SentenceTransformer.
-Supports Qwen/Qwen3-Embedding-4B model.
+embed.py
+--------
+This module provides functionality to generate dense embeddings for document chunks
+using a Hugging Face SentenceTransformer model, as configured in default.yaml.
 """
 
 from typing import List, Dict, Any

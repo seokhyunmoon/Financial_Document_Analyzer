@@ -1,15 +1,20 @@
-# src/graph/utils/weaviate_client.py
+# src/graph/nodes/weaviate.py
 """
-weaviate_client.py
-------------------
-Utilities for connecting to a Weaviate instance (v4), ensuring a collection/schema is present,
-and uploading objects (with embeddings) in batch.
+weaviate.py
+-----------
+This module provides utilities for connecting to a Weaviate instance,
+managing collections, and efficiently uploading document chunks with their embeddings.
 """
 
 from typing import List, Dict, Any
 import weaviate
 from weaviate.classes.config import Property, DataType, Configure
 from weaviate.classes.init import AdditionalConfig, Timeout
+from utils.logger import get_logger
+from utils.config import load_config, get_section
+
+logger = get_logger(__name__)
+
 
 def init_client(host: str = "http://localhost:8080",
                 grpc_port: int = 50051,
@@ -28,6 +33,12 @@ def init_client(host: str = "http://localhost:8080",
     Raises:
         RuntimeError: If the client cannot confirm readiness of the instance.
     """
+    cfg = load_config()
+    wsec = get_section(cfg, "weaviate")
+    host = wsec.get("host", host)
+    grpc_port = int(wsec.get("grpc_port", grpc_port))
+    
+    
     client = weaviate.connect_to_local(
         host="localhost",
         port=8080,
@@ -37,7 +48,7 @@ def init_client(host: str = "http://localhost:8080",
     )
     if not skip_init_checks and not client.is_ready():
         raise RuntimeError(f"Weaviate at {host} is not ready.")
-    print(f"[OK] Connected to Weaviate at {host}")
+    logger.info(f"[OK] Connected to Weaviate at {host}")
     return client
 
 def create_collection(client: weaviate.WeaviateClient,

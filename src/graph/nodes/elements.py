@@ -1,4 +1,11 @@
-from typing import List, Dict, Any, Optional
+# src/graph/nodes/elements.py
+"""
+elements.py
+-----------
+This module handles the extraction and normalization of structural elements from PDF documents
+using the Unstructured library, applying configuration-driven cleaning and mapping
+to a simplified schema for downstream processing.
+"""
 import re
 from unstructured.partition.pdf import partition_pdf
 from unstructured.cleaners.core import replace_unicode_quotes, clean 

@@ -1,4 +1,10 @@
 # src/graph/nodes/chunks.py
+"""
+chunks.py
+---------
+This module provides functionality to merge extracted elements into structural chunks
+based on predefined rules and configuration, preparing them for further processing.
+"""
 
 from typing import List, Dict, Any
 from tqdm import tqdm
