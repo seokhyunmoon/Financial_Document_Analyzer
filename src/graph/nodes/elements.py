@@ -76,12 +76,11 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
         List[Dict[str, Any]]:
             A list of element dicts:
             {
+              "source_doc": str,
               "doc_id": str,
               "type": "title" | "text" | "table",
               "text": str,
               "page": int | None,
-              "bbox": Dict[str, Any] | None,
-              "caption": str | None       # Table caption if available
             }
     """
     cfg = _load_config()
