@@ -12,7 +12,7 @@ paths:
 
 partitioning:
   strategy: hi_res
-  hi_res_model: yolox #detectron2_onnx
+  hi_res_model: yolox
   languages:
     - eng
   infer_table_structure: true
@@ -35,7 +35,6 @@ chunking:
 
 embedding:
   model_name: Qwen/Qwen3-Embedding-4B
-  provider: sentence-transformers
   batch_size: 8
   normalize_embeddings: true
   vector_dimension: 2560
