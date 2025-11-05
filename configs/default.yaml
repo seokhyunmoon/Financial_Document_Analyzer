@@ -1,6 +1,5 @@
-topk: 10
-
-limits:
+qa:
+  topk: 10
   context_tokens_budget: 3000
 
 paths:
@@ -29,9 +28,6 @@ cleaning:
 
 chunking:
   min_chars: 2048
-  boundary_types:
-    - title
-    - table
 
 embedding:
   model_name: Qwen/Qwen3-Embedding-4B

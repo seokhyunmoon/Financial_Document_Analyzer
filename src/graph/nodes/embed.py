@@ -9,7 +9,7 @@ using a Hugging Face SentenceTransformer model, as configured in default.yaml.
 from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
 import numpy as np
-from tqdm import tqdm
+from torch import cuda
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 
@@ -36,7 +36,13 @@ def generate_embeddings(
     model_name = esec.get("model_name", "Qwen/Qwen3-Embedding-4B")
     batch_size = int(esec.get("batch_size", 8))
     normalize_embeddings = bool(esec.get("normalize_embeddings", True))
-    device = esec.get("device", "cpu")
+
+    if cuda.is_available():
+        device = "cuda"
+        logger.info(f"[INFO] Using CUDA device for embedding generation.")
+    else:
+        device = "cpu"
+        logger.info(f"[INFO] Using CPU device for embedding generation.")
     
     logger.info(f"[INFO] Loading model: {model_name}")
     model = SentenceTransformer(model_name)
