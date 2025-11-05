@@ -1,4 +1,3 @@
-# scripts/step0_2_test_elements_native.py
 import sys, json
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))

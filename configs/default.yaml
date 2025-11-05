@@ -40,9 +40,11 @@ embedding:
   vector_dimension: 2560
 
 vectordb:
-  host: localhost
-  port: 8080
-  grpc_port: 50051
-  skip_init_checks: true
-  use_server_embeddings: false
-  model_name: null
+  init:
+    host: localhost
+    port: 8080
+    grpc_port: 50051
+    skip_init_checks: true
+  upload:
+    batch_size: 100
+    concurrent_requests: 4

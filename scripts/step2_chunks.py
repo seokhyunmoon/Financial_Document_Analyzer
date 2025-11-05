@@ -1,5 +1,3 @@
-# scripts/step2_chunks.py
-
 import sys
 import jsonlines
 from pathlib import Path

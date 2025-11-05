@@ -7,6 +7,7 @@ using the Unstructured library, applying configuration-driven cleaning and mappi
 to a simplified schema for downstream processing.
 """
 import re
+from typing import List, Dict, Any, Optional
 from unstructured.partition.pdf import partition_pdf
 from unstructured.cleaners.core import replace_unicode_quotes, clean 
 from utils.logger import get_logger

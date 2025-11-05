@@ -32,11 +32,11 @@ def init_client(skip_init_checks: Optional[bool] = None) -> weaviate.WeaviateCli
         RuntimeError: If client is not ready and checks are enabled.
     """
     cfg = load_config()
-    wsec = get_section(cfg, "vectordb")
-    host = wsec.get("host", "localhost")
-    port = int(wsec.get("port", 8080))
-    grpc_port = int(wsec.get("grpc_port", 50051))
-    cfg_skip = bool(wsec.get("skip_init_checks", False))
+    vsec = get_section(cfg, "vectordb")
+    host = vsec.get("host", "localhost")
+    port = vsec.get("port", 8080)
+    grpc_port = vsec.get("grpc_port", 50051)
+    cfg_skip = vsec.get("skip_init_checks", False)
     if skip_init_checks is None:
         skip_init_checks = cfg_skip
 
@@ -131,6 +131,12 @@ def upload_objects(
         batch_size: Fixed batch size.
         concurrent_requests: Number of parallel insert workers.
     """
+    cfg = load_config()
+    vsec = get_section(cfg, "vectordb")
+    upload_cfg = get_section(vsec, "upload")
+    batch_size = upload_cfg.get("batch_size", batch_size)
+    concurrent_requests = upload_cfg.get("concurrent_requests", concurrent_requests)
+
     col = client.collections.get(collection_name)
     total = 0
 
