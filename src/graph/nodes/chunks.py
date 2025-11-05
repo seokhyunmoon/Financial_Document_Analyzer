@@ -23,8 +23,6 @@ def merge_elements_to_chunks(
 
     Args:
         elements (List[Dict[str, Any]]): List of elements from Unstructured (sorted by page and order).
-        min_chars (int): Minimum length before splitting into a new chunk.
-        boundary_types (List[str]): Types that start a new chunk (e.g., title, table).
 
     Returns:
         List[Dict[str, Any]]: List of merged chunk dictionaries with metadata.
@@ -34,9 +32,9 @@ def merge_elements_to_chunks(
     cfg = load_config()
     csec = get_section(cfg, "chunking")
     min_chars = int(csec.get("min_chars", 2048))
-    boundary_types = csec.get("boundary_types", boundary_types)
     
     # merging logic
+    boundary_types = ["title", "table"]
     chunks: List[Dict[str, Any]] = []
     current_chunk: List[Dict[str, Any]] = []
     current_length: int = 0

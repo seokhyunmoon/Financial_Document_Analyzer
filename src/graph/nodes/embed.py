@@ -24,9 +24,6 @@ def generate_embeddings(
 
     Args:
         chunks (List[Dict[str, Any]]): List of chunk dictionaries.
-        model_name (str): HuggingFace model ID for SentenceTransformer.
-        batch_size (int): Batch size for encoding.
-        normalize_embeddings (bool): Whether to L2-normalize embeddings before storage.
 
     Returns:
         List[Dict[str, Any]]: Same chunks, each with an 'embedding' key added.

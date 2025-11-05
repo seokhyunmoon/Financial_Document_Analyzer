@@ -2,7 +2,7 @@ import sys, json
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from graph.nodes._elements import extract_elements
+from graph.nodes.elements import extract_elements
 
 def main():
     pdf_path = Path("data/raw/28.pdf")

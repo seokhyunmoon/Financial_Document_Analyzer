@@ -15,6 +15,7 @@ from graph.nodes.vectordb import (
     init_client,
     close_client,
     ensure_collection,
+    reset_collection,
     upload_objects,
     count_objects,
 )
@@ -22,47 +23,17 @@ from graph.nodes.vectordb import (
 logger = get_logger(__name__)
 
 
-def _gather_embedded_rows(emb_dir: Path) -> List[Dict[str, Any]]:
-    """Load all *.jsonl files from embeddings directory."""
-    if not emb_dir.exists():
-        raise FileNotFoundError(f"Embeddings directory not found: {emb_dir}")
-
-    files = sorted(emb_dir.glob("*.jsonl"))
-    if not files:
-        raise FileNotFoundError(f"No JSONL files found under: {emb_dir}")
-
-    rows: List[Dict[str, Any]] = []
-    for fp in files:
-        data = read_jsonl(str(fp))
-        if not data:
-            logger.warning(f"[WARN] Empty file skipped: {fp}")
-            continue
-        rows.extend(data)
-        logger.info(f"[INFO] Loaded {len(data)} rows from {fp.name}")
-
-    if not rows:
-        raise RuntimeError("No embedded rows were loaded; check your embed step outputs.")
-    return rows
-
-
 def main() -> None:
     """Connect, ensure collection, upload objects with vectors, and verify count."""
     cfg = load_config()
-    psec = get_section(cfg, "paths")
     vsec = get_section(cfg, "vectordb")
     esec = get_section(cfg, "embedding")
 
-    # Resolve embeddings directory (fallback to default path)
-    try:
-        emb_dir = resolve_path(cfg, "paths", "embeddings_dir")
-    except Exception:
-        emb_dir = Path("data/processed/embeddings")
-
     collection_name = vsec.get("collection_name", "FinancialDocChunk")
-    vector_dim = int(esec.get("vector_dimension", 2560))
 
-    logger.info(f"[STEP 1] Loading embedded rows from {emb_dir}")
-    rows = _gather_embedded_rows(emb_dir)
+    logger.info(f"[STEP 1] Loading embeddedings")
+    
+    rows = read_jsonl("data/processed/embeddings/28_embedded_chunks.jsonl")
     with_vec = sum(1 for r in rows if r.get("embedding") is not None)
     logger.info(f"[INFO] Total rows: {len(rows)} (with vectors: {with_vec})")
 
@@ -70,8 +41,11 @@ def main() -> None:
     client = init_client()
 
     try:
-        logger.info(f"[STEP 3] Ensuring collection '{collection_name}' (dim={vector_dim})")
-        ensure_collection(client, name=collection_name, vector_dim=vector_dim)
+        reset_collection(client, collection_name)
+        logger.info(f"[OK] Reset collection '{collection_name}'")
+        
+        logger.info(f"[STEP 3] Ensuring collection '{collection_name}'")
+        ensure_collection(client, name=collection_name)
 
         logger.info(f"[STEP 4] Uploading {len(rows)} objects to '{collection_name}'")
         upload_objects(

@@ -48,3 +48,4 @@ vectordb:
   upload:
     batch_size: 100
     concurrent_requests: 4
+    upsert: true

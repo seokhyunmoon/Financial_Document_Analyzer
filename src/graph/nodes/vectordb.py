@@ -11,7 +11,7 @@ from typing import List, Dict, Any, Optional
 import weaviate
 from weaviate.classes.config import Property, DataType, Configure
 from weaviate.classes.init import AdditionalConfig, Timeout
-
+from weaviate.util import generate_uuid5
 from utils.config import load_config, get_section
 from utils.logger import get_logger
 
@@ -72,19 +72,35 @@ def close_client(client: Optional[weaviate.WeaviateClient]) -> None:
         logger.warning(f"[WARN] Failed to close client cleanly: {e}")
 
 
-def ensure_collection(client: weaviate.WeaviateClient, name: str, vector_dim: int) -> None:
+def count_objects(client: weaviate.WeaviateClient, collection_name: str) -> int:
+    """Count total objects in a collection.
+
+    Args:
+        client: Weaviate client.
+        collection_name: Target collection.
+
+    Returns:
+        int: Total count (aggregate).
+    """
+    col = client.collections.get(collection_name)
+    agg = col.aggregate.over_all(total_count=True)
+    return int(getattr(agg, "total_count", 0))
+
+
+def ensure_collection(client: weaviate.WeaviateClient, name: str) -> None:
     """Ensure a collection for manual vectors exists; create if missing.
 
     Args:
         client: Connected Weaviate client.
         name: Collection name.
-        vector_dim: Embedding dimension (must match embedder output).
 
     Notes:
         - Vectorizer is set to `none`; vectors must be provided on insert.
         - Properties align with the upload payload from embed.py/chunks.py.
         - `chunk_id` is TEXT to allow flexible identifiers.
     """
+    logger.info(f"[INFO] Creating collection '{name}' ...")
+    
     props = [
         Property(name="source_doc",   data_type=DataType.TEXT),
         Property(name="doc_id",       data_type=DataType.TEXT),
@@ -105,14 +121,31 @@ def ensure_collection(client: weaviate.WeaviateClient, name: str, vector_dim: in
         logger.info(f"[INFO] Collection '{name}' already exists.")
         return
 
-    vector_cfg = Configure.Vectors.none(dimensions=int(vector_dim))
+    vector_cfg = Configure.Vectors.self_provided()
     client.collections.create(
         name=name,
-        description=f"Financial document chunks (dim={vector_dim})",
+        description=f"Financial document chunks",
         vector_config=vector_cfg,
         properties=props,
     )
-    logger.info(f"[OK] Created collection '{name}' (vectorizer=None, dim={vector_dim})")
+    logger.info(f"[OK] Created collection '{name}'")
+
+ 
+def reset_collection(client: weaviate.WeaviateClient, name: str) -> None:
+    """Drop and re-create the collection using ensure_collection.
+    
+    Args:
+        client: Connected Weaviate client.
+        name: Collection name.
+    """
+    if client.collections.exists(name):
+        logger.info(f"[INFO] Dropping collection '{name}' ...")
+        client.collections.delete(name)  
+        logger.info(f"[OK] Dropped '{name}'")
+    cfg = load_config()
+    vec_dim = int(get_section(cfg, "embedding").get("vector_dimension", 2560))
+    ensure_collection(client, name, vec_dim)
+    logger.info(f"[OK] Reset collection '{name}'")
 
 
 def upload_objects(
@@ -121,6 +154,7 @@ def upload_objects(
     objects: List[Dict[str, Any]],
     batch_size: int = 100,
     concurrent_requests: int = 4,
+    upsert: bool = True,
 ) -> None:
     """Batch upload objects (with optional vectors).
 
@@ -131,51 +165,78 @@ def upload_objects(
         batch_size: Fixed batch size.
         concurrent_requests: Number of parallel insert workers.
     """
+    logger.info(f"[INFO] Upserting objects to '{collection_name}' ...")
+    
+    # load config 
     cfg = load_config()
     vsec = get_section(cfg, "vectordb")
     upload_cfg = get_section(vsec, "upload")
     batch_size = upload_cfg.get("batch_size", batch_size)
     concurrent_requests = upload_cfg.get("concurrent_requests", concurrent_requests)
+    upsert = upload_cfg.get("upsert", upsert)
 
     col = client.collections.get(collection_name)
     total = 0
+    failed = 0
 
-    # NOTE: vector is not a property; attach via `vector=` when adding objects.
-    # Ref: Custom vectors guide.
+    def _props_from_obj(obj: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            "source_doc":   obj.get("source_doc", "unknown"),
+            "doc_id":       str(obj.get("doc_id", "")),
+            "chunk_id":     str(obj.get("chunk_id", "")),   
+            "element_type": str(obj.get("type", "")),       
+            "text":         obj.get("text", ""),
+            "page_start":   obj.get("page_start"),
+            "page_end":     obj.get("page_end"),
+        }
+
+    if upsert:
+        # Idempotent path: insert with deterministic UUID; on conflict, replace.
+        for obj in objects:
+            props = _props_from_obj(obj)
+            vec = obj.get("embedding") or obj.get("vector")
+            # Stable key for UUIDv5
+            key = {
+                "source_doc": props["source_doc"],
+                "doc_id":     props["doc_id"],
+                "chunk_id":   props["chunk_id"],
+            }
+            uuid = generate_uuid5(key)
+            try:
+                # Try create (fast path when not exists)
+                col.data.insert(properties=props, uuid=uuid, vector=vec)
+                total += 1
+            except Exception:
+                # If already exists (or other insert error), replace to achieve upsert semantics
+                try:
+                    col.data.replace(uuid=uuid, properties=props, vector=vec)
+                    total += 1
+                except Exception as e:
+                    failed += 1
+                    logger.warning(f"[WARN] Upsert failed for UUID={uuid}: {e}")
+        if failed:
+            logger.warning(f"[WARN] {failed} objects failed to upsert.")
+        logger.info(f"[OK] Upserted {total} objects to '{collection_name}'")
+        return
+
+    # Standard insert path: batch insert without UUIDs (auto-generated).
     with col.batch.fixed_size(batch_size=batch_size, concurrent_requests=concurrent_requests) as batch:
         for obj in objects:
-            props = {
-                "source_doc":   obj.get("source_doc", "unknown"),
-                "doc_id":       str(obj.get("doc_id", "")),
-                "chunk_id":     str(obj.get("chunk_id", "")),   # cast to TEXT
-                "element_type": str(obj.get("element_type", obj.get("type", ""))),
-                "text":         obj.get("text", ""),
-                "page_start":   obj.get("page_start"),
-                "page_end":     obj.get("page_end"),
-            }
+            props = _props_from_obj(obj)
             vec = obj.get("embedding") or obj.get("vector")
+            key = {
+                "source_doc": props["source_doc"],
+                "doc_id":     props["doc_id"],
+                "chunk_id":   props["chunk_id"],
+            }
+            uuid = generate_uuid5(key)
             if vec is not None:
-                batch.add_object(properties=props, vector=vec)
+                batch.add_object(properties=props, vector=vec, uuid=uuid)
             else:
-                batch.add_object(properties=props)
+                batch.add_object(properties=props, uuid=uuid)
             total += 1
 
-    errs = getattr(batch, "number_errors", 0)
-    if errs:
-        logger.warning(f"[WARN] {errs} objects failed to upload.")
-    logger.info(f"[OK] Uploaded {total - errs} objects to '{collection_name}'")
-
-
-def count_objects(client: weaviate.WeaviateClient, collection_name: str) -> int:
-    """Count total objects in a collection.
-
-    Args:
-        client: Weaviate client.
-        collection_name: Target collection.
-
-    Returns:
-        int: Total count (aggregate).
-    """
-    col = client.collections.get(collection_name)
-    agg = col.aggregate.over_all(total_count=True)
-    return int(getattr(agg, "total_count", 0))
+        errs = getattr(batch, "number_errors", 0)
+        if errs:
+            logger.warning(f"[WARN] {errs} objects failed to upload.")
+        logger.info(f"[OK] Uploaded {total - errs} objects to '{collection_name}'")

@@ -9,7 +9,7 @@ from graph.nodes.embed import generate_embeddings
 with open("data/processed/chunks/28_chunks.jsonl") as f:
     chunks = [json.loads(line) for line in f]
 
-embedded = generate_embeddings(chunks, batch_size=4)
+embedded = generate_embeddings(chunks)
 output_path = Path(f"data/processed/embeddings/28_embedded_chunks.jsonl")
 
 with jsonlines.open(output_path, "w") as writer:
