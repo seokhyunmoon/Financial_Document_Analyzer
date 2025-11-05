@@ -1,6 +1,5 @@
 qa:
   topk: 10
-  context_tokens_budget: 3000
 
 paths:
   raw_dir: data/raw

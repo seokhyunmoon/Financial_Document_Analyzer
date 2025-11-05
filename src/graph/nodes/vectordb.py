@@ -33,10 +33,11 @@ def init_client(skip_init_checks: Optional[bool] = None) -> weaviate.WeaviateCli
     """
     cfg = load_config()
     vsec = get_section(cfg, "vectordb")
-    host = vsec.get("host", "localhost")
-    port = vsec.get("port", 8080)
-    grpc_port = vsec.get("grpc_port", 50051)
-    cfg_skip = vsec.get("skip_init_checks", False)
+    init_cfg = get_section(vsec, "init")
+    host = init_cfg.get("host", "localhost")
+    port = init_cfg.get("port", 8080)
+    grpc_port = init_cfg.get("grpc_port", 50051)
+    cfg_skip = init_cfg.get("skip_init_checks", False)
     if skip_init_checks is None:
         skip_init_checks = cfg_skip
 
@@ -142,9 +143,7 @@ def reset_collection(client: weaviate.WeaviateClient, name: str) -> None:
         logger.info(f"[INFO] Dropping collection '{name}' ...")
         client.collections.delete(name)  
         logger.info(f"[OK] Dropped '{name}'")
-    cfg = load_config()
-    vec_dim = int(get_section(cfg, "embedding").get("vector_dimension", 2560))
-    ensure_collection(client, name, vec_dim)
+    ensure_collection(client, name)
     logger.info(f"[OK] Reset collection '{name}'")
 
 

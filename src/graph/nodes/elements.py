@@ -77,7 +77,7 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
             }
     """
     cfg = load_config()
-    ucfg = get_section(cfg, "unstructured")
+    ucfg = get_section(cfg, "partitioning")
     cleaning_cfg = get_section(cfg, "cleaning")
 
     # Extract elements using configured options

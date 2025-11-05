@@ -45,7 +45,11 @@ def generate_embeddings(
         logger.info(f"[INFO] Using CPU device for embedding generation.")
     
     logger.info(f"[INFO] Loading model: {model_name}")
-    model = SentenceTransformer(model_name)
+    try:
+        model = SentenceTransformer(model_name, device=device)
+    except Exception as e:
+        logger.error(f"[ERROR] Failed to load model {model_name}: {e}")
+        raise
 
     texts = [c["text"] for c in chunks]
     logger.info(f"[INFO] Generating embeddings for {len(texts)} chunks...")
@@ -68,4 +72,9 @@ def generate_embeddings(
         chunks[i]["embedding"] = emb.tolist()
 
     logger.info(f"[OK] Embeddings generated: {len(chunks)} items, dim={len(embeddings[0])}")
+    dim = int(len(embeddings[0]))
+    vector_dim = esec.get("vector_dimension", 0)
+    if vector_dim != 0 and vector_dim != dim:
+        logger.warning(f"[WARN] Configured vector_dimension {vector_dim} does not match actual dimension {dim}.")
+    
     return chunks

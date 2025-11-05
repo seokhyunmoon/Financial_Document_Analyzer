@@ -47,9 +47,10 @@ def merge_elements_to_chunks(
         if el_type in boundary_types:
             if current_chunk:
                 merged_text = " ".join(e["text"].strip() for e in current_chunk if e.get("text"))
+                head = current_chunk[0]
                 chunks.append({
-                    "source_doc": el.get("source_doc"),
-                    "doc_id": el.get("doc_id"),
+                    "source_doc": head.get("source_doc"),
+                    "doc_id": head.get("doc_id"),
                     "chunk_id": chunk_id,
                     "type": "text",
                     "text": merged_text.strip(),
@@ -82,9 +83,10 @@ def merge_elements_to_chunks(
         # if enough length reached → finalize chunk
         if current_length >= min_chars:
             merged_text = " ".join(e["text"].strip() for e in current_chunk if e.get("text"))
+            head = current_chunk[0]
             chunks.append({
-                "source_doc": el.get("source_doc"),
-                "doc_id": el.get("doc_id"),
+                "source_doc": head.get("source_doc"),
+                "doc_id": head.get("doc_id"),
                 "chunk_id": chunk_id,
                 "type": "text",
                 "text": merged_text.strip(),
@@ -99,9 +101,10 @@ def merge_elements_to_chunks(
     # finalize remaining chunk
     if current_chunk:
         merged_text = " ".join(e["text"].strip() for e in current_chunk if e.get("text"))
+        head = current_chunk[0]
         chunks.append({
-            "source_doc": el.get("source_doc"),
-            "doc_id": el.get("doc_id"),
+            "source_doc": head.get("source_doc"),
+            "doc_id": head.get("doc_id"),
             "chunk_id": chunk_id,
             "type": "text",
             "text": merged_text.strip(),
