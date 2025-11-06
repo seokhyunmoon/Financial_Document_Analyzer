@@ -1,0 +1,12 @@
+system: |
+  please answer the question below by referencing the list of sources provided after the question; if the question can not be answered just respond 'No answer'.
+  The sources are listed after "Sources:".
+
+user: |
+  Question: {{ question }}
+
+  Sources:
+  {% for i, k in topk %}
+  [{{ i }} | {{ k.doc_id }} p{{ k.page_start }}-{{ k.page_end }}]
+  {{ k.text }}
+  {% endfor %}
