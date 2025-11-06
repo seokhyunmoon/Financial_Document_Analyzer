@@ -1,13 +1,11 @@
-qa:
-  topk: 10
-
 paths:
   raw_dir: data/raw
   elements_dir: data/processed/elements
   chunks_dir: data/processed/chunks
-  index_dense_dir: data/index/dense
+  embed_dir: data/processed/embeddings
   logs_dir: data/logs
 
+# /src/graph/nodes/elements.py
 partitioning:
   strategy: hi_res
   hi_res_model: yolox
@@ -25,9 +23,11 @@ cleaning:
     trailing_punctuation: false
     lowercase: false
 
+# /src/graph/nodes/chunks.py
 chunking:
   min_chars: 2048
 
+# /src/graph/nodes/embed.py
 embedding:
   model_name: Qwen/Qwen3-Embedding-4B
   batch_size: 8
@@ -38,6 +38,7 @@ embedding:
     doc: passage
     query: query
 
+# /src/graph/nodes/vectordb.py
 vectordb:
   init:
     host: localhost
@@ -48,3 +49,11 @@ vectordb:
     batch_size: 100
     concurrent_requests: 4
     upsert: true
+
+# /src/graph/nodes/retrieve.py
+qa:
+  topk: 10
+
+# /src/graph/nodes/generate.py
+generate:
+  provider: ollama
