@@ -1,4 +1,9 @@
 # src/graph/nodes/retrieve.py
+"""
+retrieve.py
+-----------
+This module defines nodes for retrieving relevant document chunks from the vector database based on a query.
+"""
 from typing import List, Dict, Any, Optional
 from weaviate.classes.query import Filter
 from utils.logger import get_logger
@@ -13,7 +18,24 @@ def retrieve_topk(
     topk: Optional[int] = None,
     source_doc: Optional[str] = None,  
 ) -> List[Dict[str, Any]]:
-    
+    """Retrieves the top-k most relevant document chunks for a given question.
+
+    This function first converts the input question into a vector embedding.
+    It then uses this embedding to perform a similarity search in the Weaviate
+    vector database to find the most relevant document chunks. An optional
+    filter can be applied to limit the search to a specific source document.
+
+    Args:
+        question: The question to find relevant documents for.
+        topk: The number of top results to retrieve. If None, defaults to the
+              value specified in the configuration file.
+        source_doc: Optional. The name of the source document to filter results by.
+                      If None, the search is performed across all documents.
+
+    Returns:
+        A list of dictionaries, where each dictionary contains the metadata
+        and text of a retrieved document chunk.
+    """
     # load config
     cfg = load_config()
     qsec = get_section(cfg, "qa")
