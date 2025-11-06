@@ -10,7 +10,7 @@ from graph.nodes.generate import generator
 
 logger = get_logger(__name__)
 
-QUESTION = "What was PepsiCo's total revenue in 2022?"
+QUESTION = "What is the total amount that PepsiCo expects to pay in dividends to shareholders in 2023?"
 TOPK = 5
 SOURCE_DOC = "28"          # set to None to disable filtering
 PREVIEW_LEN = 400          # characters to preview per hit
