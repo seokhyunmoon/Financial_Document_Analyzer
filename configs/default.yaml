@@ -33,6 +33,10 @@ embedding:
   batch_size: 8
   normalize_embeddings: true
   vector_dimension: 2560
+  use_promts: true
+  promts:
+    doc: passage
+    query: query
 
 vectordb:
   init:

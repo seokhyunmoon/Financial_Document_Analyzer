@@ -37,14 +37,11 @@ def generate_embeddings(
     batch_size = int(esec.get("batch_size", 8))
     normalize_embeddings = bool(esec.get("normalize_embeddings", True))
 
-    if cuda.is_available():
-        device = "cuda"
-        logger.info(f"[INFO] Using CUDA device for embedding generation.")
-    else:
-        device = "cpu"
-        logger.info(f"[INFO] Using CPU device for embedding generation.")
+    # determine device
+    device = "cuda" if cuda.is_available() else "cpu"
+    logger.info(f"[INFO] Using {device.upper()} device for embedding generation.")
     
-    logger.info(f"[INFO] Loading model: {model_name}")
+    # load model
     try:
         model = SentenceTransformer(model_name, device=device)
     except Exception as e:
@@ -54,13 +51,31 @@ def generate_embeddings(
     texts = [c["text"] for c in chunks]
     logger.info(f"[INFO] Generating embeddings for {len(texts)} chunks...")
 
-    #raw encoding (keep internal normalization off for pipeline control)
-    embeddings = model.encode(
-        texts,
+    # check for prompt usage (config + model support)
+    use_prompts = bool(esec.get("use_prompts", True))
+    doc_key = esec.get("prompts", {}).get("doc", "passage")
+    prompt_name = None
+    if use_prompts and hasattr(model, "prompts"):
+        if isinstance(getattr(model, "prompts"), dict) and doc_key in model.prompts:
+            prompt_name = doc_key
+            logger.info(f"[INFO] Using document prompt_name='{prompt_name}'")
+        else:
+            logger.warning(f"[WARN] Document prompt_name='{doc_key}' not found in model.prompts")
+            prompt_name = None
+
+    
+    # kwargs
+    encode_kwargs = dict(
         batch_size=batch_size,
         show_progress_bar=True,
         normalize_embeddings=False,
-        device=device
+        device=device,
+    )
+    if prompt_name:
+        encode_kwargs["prompt_name"] = prompt_name
+    #raw encoding (keep internal normalization off for pipeline control)    
+    embeddings = model.encode(
+        texts, **encode_kwargs
     )
 
     # optional pipeline-level normalization
@@ -71,8 +86,8 @@ def generate_embeddings(
     for i, emb in enumerate(embeddings):
         chunks[i]["embedding"] = emb.tolist()
 
-    logger.info(f"[OK] Embeddings generated: {len(chunks)} items, dim={len(embeddings[0])}")
     dim = int(len(embeddings[0]))
+    logger.info(f"[OK] Embeddings generated: {len(chunks)} items, dim={len(embeddings[0])}")
     vector_dim = esec.get("vector_dimension", 0)
     if vector_dim != 0 and vector_dim != dim:
         logger.warning(f"[WARN] Configured vector_dimension {vector_dim} does not match actual dimension {dim}.")

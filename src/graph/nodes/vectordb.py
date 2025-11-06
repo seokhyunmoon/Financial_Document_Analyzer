@@ -9,7 +9,7 @@ Weaviate connection & collection helpers for manual (custom) vectors.
 from __future__ import annotations
 from typing import List, Dict, Any, Optional
 import weaviate
-from weaviate.classes.config import Property, DataType, Configure
+from weaviate.classes.config import Property, DataType, Configure, VectorDistances
 from weaviate.classes.init import AdditionalConfig, Timeout
 from weaviate.util import generate_uuid5
 from utils.config import load_config, get_section
@@ -122,7 +122,12 @@ def ensure_collection(client: weaviate.WeaviateClient, name: str) -> None:
         logger.info(f"[INFO] Collection '{name}' already exists.")
         return
 
-    vector_cfg = Configure.Vectors.self_provided()
+    #Bring your own vectors + 
+    vector_cfg = Configure.Vectors.self_provided(
+        vector_index_config=Configure.VectorIndex.hnsw(
+            distance_metric=VectorDistances.COSINE,
+        )
+    )
     client.collections.create(
         name=name,
         description=f"Financial document chunks",

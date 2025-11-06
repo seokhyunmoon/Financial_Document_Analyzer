@@ -17,4 +17,4 @@ with jsonlines.open(output_path, "w") as writer:
         writer.write(c)
         
 print(embedded[0].keys())        # expect: includes 'embedding'
-print(len(embedded[0]["embedding"]))  # expect: 1536
+print(len(embedded[0]["embedding"])) 
