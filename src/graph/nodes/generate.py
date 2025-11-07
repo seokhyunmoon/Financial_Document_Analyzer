@@ -5,6 +5,7 @@ generate.py
 This module defines nodes for generating natural language answers based on a user's question and retrieved document chunks using llms.
 """
 from typing import List, Dict, Any
+from models.ollama import _generate_ollama
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 from utils.prompts import load_prompt, render_prompt
@@ -47,29 +48,6 @@ def _build_messages(question: str, topk: List[Dict[str, Any]]) -> List[Dict[str,
     return [{"role": "system", "content": system},
             {"role": "user",   "content": user}]
 
-
-def _generate_ollama(model_name: str, messages: List[Dict[str,str]], gsec: dict) -> str:
-    """Generates a response using an Ollama chat model.
-
-    Args:
-        model_name: The name of the Ollama model to use for generation.
-        messages: The list of messages (prompt) to send to the model.
-        gsec: The 'generate' section of the configuration dictionary (currently unused).
-
-    Returns:
-        The generated answer as a string.
-    """
-    from ollama import chat
-    
-    # options = {
-    #     "temperature": gsec.get("temperature", 0.1),
-    #     "num_ctx": gsec.get("num_ctx", 512),
-    #     "top_k": gsec.get("top_k", 10),
-    #     "top_p": gsec.get("top_p", 0.8),
-    # }
-    response = chat(model=model_name, messages=messages, options={})
-    return response['message']['content']
-    
 
 def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
     """Generates an answer to a question using retrieved documents.
