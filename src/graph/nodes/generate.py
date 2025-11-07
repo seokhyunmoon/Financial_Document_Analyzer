@@ -88,7 +88,7 @@ def generator(question: str, topk: List[Dict[str, Any]]) -> dict:
     """
     if not topk:
         logger.warning("[WARN] No retrieved documents found. Returning empty response.")
-        return {"answer": "No Answer", "Source": [], "used": 0}
+        return {"answer": "No Answer", "source": [], "used": 0}
     
     # load config
     cfg = load_config()
@@ -107,4 +107,4 @@ def generator(question: str, topk: List[Dict[str, Any]]) -> dict:
     
 
     citation = [i for i in range(1, len(topk)+1) if f"[{i}]" in answer]
-    return {"answer": answer, "Source": citation, "used": len(topk)}
+    return {"answer": answer, "source": citation, "used": len(topk)}

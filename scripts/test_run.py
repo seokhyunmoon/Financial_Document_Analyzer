@@ -10,8 +10,9 @@ if __name__ == "__main__":
     out = app.invoke({"question": "What is the total amount that PepsiCo expects to pay in dividends to shareholders in 2023?",
                       "topk": 5,
                       "source_doc": None})
-
+    
+    ans = out.get("answer", {})
     print("\n=== ANSWER ===")
-    print(out.get("answer", {}).strip())
-    print("Citations:", out.get("citations"))
-    print("Used:", out.get("used"))
+    print(ans.get("answer","").strip())
+    print("Citations:", ans.get("source"))
+    print("Used:", ans.get("used"))
