@@ -11,20 +11,16 @@ logger = get_logger(__name__)
 
 class QAState(TypedDict, total=False):
     question: str
-    qvec: List[float]
+    question_vector: List[float]
     hits: List[Dict[str, Any]]
     answer: Dict[str, Any]
-    topk: int
-    source_doc: Optional[str]
 
 def node_encode(state: QAState) -> QAState:
-    state["qvec"] = query_embeddings(state["question"])
+    state["question_vector"] = query_embeddings(state["question"])
     return state
 
 def node_retrieve(state: QAState) -> QAState:
-    k = int(state.get("topk", 10))
-    src = state.get("source_doc")
-    state["hits"] = retrieve_topk(state["question"], topk=k, source_doc=src)
+    state["hits"] = retrieve_topk(state["question"], state["question_vector"])
     return state
 
 # def node_rerank(state: QAState) -> QAState:
