@@ -14,52 +14,43 @@ from graph.nodes.query import query_embeddings
 logger = get_logger(__name__)
 
 def retrieve_topk(
-    question: str,
-    topk: Optional[int] = None,
-    source_doc: Optional[str] = None,  
+    question: str, 
+    question_vector: List[float],
 ) -> List[Dict[str, Any]]:
-    """Retrieves the top-k most relevant document chunks for a given question.
-
-    This function first converts the input question into a vector embedding.
-    It then uses this embedding to perform a similarity search in the Weaviate
-    vector database to find the most relevant document chunks. An optional
-    filter can be applied to limit the search to a specific source document.
+    """
+    Retrieves the top-k relevant document chunks from the vector database
+    based on the provided question embedding vector.
 
     Args:
-        question: The question to find relevant documents for.
-        topk: The number of top results to retrieve. If None, defaults to the
-              value specified in the configuration file.
-        source_doc: Optional. The name of the source document to filter results by.
-                      If None, the search is performed across all documents.
+        question: The input query string.
+        question_vector: A list of floats representing the embedding vector of the query.
+
 
     Returns:
         A list of dictionaries, where each dictionary contains the metadata
         and text of a retrieved document chunk.
     """
+    if question_vector is None:
+        question_vector = query_embeddings(question)
+    
     # load config
     cfg = load_config()
     qsec = get_section(cfg, "qa")
     vsec = get_section(cfg, "vectordb")
-    collection = vsec.get("collection_name", "FinancialDocChunk")
-    k = qsec.get("topk", 10) if topk is None else topk
-
-    # 1) generate query embedding
-    qvec = query_embeddings(question)
+    topk = qsec.get("topk", 10)
+    collection_name = vsec.get("collection_name", "FinancialDocChunk")
 
     # 2) search
     client = init_client()
     try:
-        col = client.collections.get(collection)
-        flt = Filter.by_property("source_doc").equal(source_doc) if source_doc else None
+        collection = client.collections.get(collection_name)
 
-        res = col.query.near_vector(
-            near_vector=qvec,
-            limit=k,
-            filters=flt,
+        res = collection.query.near_vector(
+            near_vector=question_vector,
+            limit=topk,
             return_properties=[
                 "source_doc","doc_id","chunk_id","element_type","text","page_start","page_end"
             ],
-            include_vector=False,
         )
 
         hits: List[Dict[str, Any]] = []
@@ -74,7 +65,7 @@ def retrieve_topk(
                 "page_end":   props.get("page_end"),
                 "text":       props.get("text"),
             })
-        logger.info(f"[OK] Retrieved {len(hits)}/{k} hits from '{collection}'")
+        logger.info(f"[OK] Retrieved {len(hits)}/{topk} hits from '{collection_name}'")
         return hits
     finally:
         close_client(client)

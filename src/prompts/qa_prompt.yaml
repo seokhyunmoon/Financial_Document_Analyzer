@@ -1,12 +1,16 @@
 system: |
   please answer the question below by referencing the list of sources provided after the question; if the question can not be answered just respond 'No answer'.
   The sources are listed after "Sources:".
+  Return the answer in the following format:
+  Answer: <your answer here> 
+  [Chunk ID:x|Doc:y|pg:z|Element:w]
+  where x is the chunk_id, y is the source document name, z is the starting page number, and w is the element type .
 
 user: |
   Question: {{ question }}
 
   Sources:
   {% for i, k in topk %}
-  [{{ i }} | {{ k.doc_id }} p{{ k.page_start }}-{{ k.page_end }}]
+  [ Chunk ID:{{k.chunk_id}} | Document:{{k.source_doc}} | Page:{{ k.page_start }} | Element:{{k.element}}]
   {{ k.text }}
   {% endfor %}

@@ -32,10 +32,12 @@ def _build_messages(question: str, topk: List[Dict[str, Any]]) -> List[Dict[str,
     
     _topk = [
         {
-            "doc_id": k.get("doc_id"),
-            "page_start": k.get("page_start"),
-            "page_end": k.get("page_end"),
+            "source_doc": k.get("source_doc"),
+            "chunk_id": k.get("chunk_id"),
+            "element": k.get("type"),
             "text": (k.get("text") or "").strip(),
+            "page_start": k.get("page_start"),
+            
         }
         for k in topk
         if (k.get("text") or "").strip()
@@ -69,7 +71,7 @@ def _generate_ollama(model_name: str, messages: List[Dict[str,str]], gsec: dict)
     return response['message']['content']
     
 
-def generator(question: str, topk: List[Dict[str, Any]]) -> dict:
+def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
     """Generates an answer to a question using retrieved documents.
 
     This function orchestrates the generation process. It first checks if any
@@ -79,14 +81,14 @@ def generator(question: str, topk: List[Dict[str, Any]]) -> dict:
 
     Args:
         question: The user's question.
-        topk: The list of retrieved document chunks to use as context.
+        hits: The list of retrieved document chunks to use as context.
 
     Returns:
         A dictionary containing the generated 'answer', a list of 'Source'
         document indices that were cited in the answer, and the number of
         documents 'used' to generate the answer.
     """
-    if not topk:
+    if not hits:
         logger.warning("[WARN] No retrieved documents found. Returning empty response.")
         return {"answer": "No Answer", "source": [], "used": 0}
     
@@ -97,7 +99,7 @@ def generator(question: str, topk: List[Dict[str, Any]]) -> dict:
     model = gsec.get("model", "qwen3:8b")
     
     # build messages
-    message = _build_messages(question, topk)
+    message = _build_messages(question, hits)
     
     # generate answer
     if provider == "ollama":
@@ -106,5 +108,5 @@ def generator(question: str, topk: List[Dict[str, Any]]) -> dict:
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     
 
-    citation = [i for i in range(1, len(topk)+1) if f"[{i}]" in answer]
-    return {"answer": answer, "source": citation, "used": len(topk)}
+    citation = [i for i in range(1, len(hits)+1) if f"[{i}]" in answer]
+    return {"answer": answer, "source": citation}
