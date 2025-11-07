@@ -94,7 +94,7 @@ def generator(question: str, topk: List[Dict[str, Any]]) -> dict:
     cfg = load_config()
     gsec = get_section(cfg, "generate")
     provider = gsec.get("provider", "ollama")
-    model = gsec.get("model", "qwen2.5:7b-instruct")
+    model = gsec.get("model", "qwen3:8b")
     
     # build messages
     message = _build_messages(question, topk)
