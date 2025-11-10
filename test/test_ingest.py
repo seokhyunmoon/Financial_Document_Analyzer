@@ -16,21 +16,21 @@ logger = get_logger(__name__)
 def main():
     cfg = load_config()
     paths = cfg.get("paths", {})
-    raw_dir = Path(paths.get("raw_dir", "data/raw"))
+    raw_dir = Path(paths.get("raw_dir", "data/pdfs"))
     elements_dir = Path(paths.get("elements_dir", "data/processed/elements"))
     chunks_dir = Path(paths.get("chunks_dir", "data/processed/chunks"))
     emb_dir = Path("data/processed/embeddings")
     collection = get_section(cfg, "vectordb").get("collection_name", "FinancialDocChunk")
 
     # pdfs = sorted(raw_dir.glob("*.pdf")) # For processing all files
-    pdfs = [Path("data/raw/28.pdf")]  # For testing a single file
+    pdfs = [Path("/Users/munseoghyeon/Desktop/Project/Financial_Document_Analyzer/data/pdfs/PEPSICO_2022_10K.pdf")]  # For testing a single file
     if not pdfs:
         logger.warning("No PDFs under data/raw")
         return
 
-    client = init_client()
+    # client = init_client()
     try:
-        ensure_collection(client, collection)
+        # ensure_collection(client, collection)
         for pdf in pdfs:
             doc_id = pdf.stem
             logger.info(f"[DOC] {pdf.name}")
@@ -45,16 +45,17 @@ def main():
             c_out = chunks_dir / f"{doc_id}_chunks.jsonl"
             write_jsonl(str(c_out), chunks)
 
-            # 3) embeddings
-            embedded = generate_embeddings(chunks)
-            m_out = emb_dir / f"{doc_id}_embedded_chunks.jsonl"
-            write_jsonl(str(m_out), embedded)
+            # # 3) embeddings
+            # embedded = generate_embeddings(chunks)
+            # m_out = emb_dir / f"{doc_id}_embedded_chunks.jsonl"
+            # write_jsonl(str(m_out), embedded)
 
-            # 4) upsert
-            upload_objects(client, collection, embedded)
-            logger.info(f"[OK] Ingested: {pdf.name} → {len(embedded)} chunks")
+            # # 4) upsert
+            # upload_objects(client, collection, embedded)
+            # logger.info(f"[OK] Ingested: {pdf.name} → {len(embedded)} chunks")
     finally:
-        close_client(client)
+        # close_client(client)
+        print("Finished ingestion process.")
 
 if __name__ == "__main__":
     main()

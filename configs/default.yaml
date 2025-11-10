@@ -1,9 +1,10 @@
 paths:
+  finanacebench: data/finanacebench
   raw_dir: data/pdfs
   elements_dir: data/processed/elements
   chunks_dir: data/processed/chunks
   embed_dir: data/processed/embeddings
-  logs_dir: data/logs
+  logs_dir: data/log
 
 # /src/graph/nodes/elements.py
 partitioning:
