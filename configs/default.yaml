@@ -1,5 +1,5 @@
 paths:
-  raw_dir: data/raw
+  raw_dir: data/pdfs
   elements_dir: data/processed/elements
   chunks_dir: data/processed/chunks
   embed_dir: data/processed/embeddings
