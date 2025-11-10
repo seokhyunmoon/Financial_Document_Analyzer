@@ -23,7 +23,7 @@ def main():
     collection = get_section(cfg, "vectordb").get("collection_name", "FinancialDocChunk")
 
     # pdfs = sorted(raw_dir.glob("*.pdf")) # For processing all files
-    pdfs = [Path("/Users/munseoghyeon/Desktop/Project/Financial_Document_Analyzer/data/pdfs/PEPSICO_2022_10K.pdf")]  # For testing a single file
+    pdfs = [Path("data/pdfs/AMERICANEXPRESS_2022_10K.pdf")]  # For testing a single file
     if not pdfs:
         logger.warning("No PDFs under data/raw")
         return
