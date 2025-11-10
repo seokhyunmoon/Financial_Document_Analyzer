@@ -5,16 +5,23 @@ import jsonlines
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from graph.nodes.embed import generate_embeddings
+from utils.files import write_jsonl
 
-with open("data/processed/chunks/28_chunks.jsonl") as f:
+pdf = Path("data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl")  # For testing a single file
+# pdf = Path("data/processed/chunks/BESTBUY_2024Q2_10Q_chunks.jsonl")  # For testing a single file
+# pdf = Path("data/processed/chunks/JOHNSON_JOHNSON_2023_8K_dated-2023-08-30_chunks.jsonl")  # For testing a single file
+# pdf = Path("data/processed/chunks/PEPSICO_2022_10K_chunks.jsonl")  # For testing a single file
+# pdf = Path("data/processed/chunks/ULTABEAUTY_2023Q4_EARNINGS_chunks.jsonl")  # For testing a single file
+
+with open(pdf) as f:
     chunks = [json.loads(line) for line in f]
 
 embedded = generate_embeddings(chunks)
-output_path = Path(f"data/processed/embeddings/28_embedded_chunks.jsonl")
+output_path = Path("data/processed/embeddings")
 
-with jsonlines.open(output_path, "w") as writer:
-    for c in embedded:
-        writer.write(c)
+c_out = output_path / f"AMERICANEXPRESS_2022_10K.jsonl"
+write_jsonl(str(c_out), embedded)
+
         
 print(embedded[0].keys())        # expect: includes 'embedding'
 print(len(embedded[0]["embedding"])) 
