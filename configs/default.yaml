@@ -33,11 +33,6 @@ embedding:
   model_name: Qwen/Qwen3-Embedding-4B
   batch_size: 8
   normalize_embeddings: true
-  vector_dimension: 2560
-  use_promts: true
-  promts:
-    doc: passage
-    query: query
 
 # /src/graph/nodes/vectordb.py
 vectordb:
