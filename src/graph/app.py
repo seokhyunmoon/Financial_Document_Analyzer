@@ -45,3 +45,6 @@ def build_graph(use_rerank: bool = False):
     g.add_edge("retrieve", "generate")
     g.add_edge("generate", END)
     return g.compile()
+
+# Expose the compiled graph for external use
+compiled_graph = build_graph()
