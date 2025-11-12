@@ -27,13 +27,12 @@ def main() -> None:
     """Connect, ensure collection, upload objects with vectors, and verify count."""
     cfg = load_config()
     vsec = get_section(cfg, "vectordb")
-    esec = get_section(cfg, "embedding")
 
     collection_name = vsec.get("collection_name", "FinancialDocChunk")
 
     logger.info(f"[STEP 1] Loading embeddedings")
     
-    rows = read_jsonl("data/processed/embeddings/28_embedded_chunks.jsonl")
+    rows = read_jsonl("data/processed/embeddings/AMERICANEXPRESS_2022_10K.jsonl")
     with_vec = sum(1 for r in rows if r.get("embedding") is not None)
     logger.info(f"[INFO] Total rows: {len(rows)} (with vectors: {with_vec})")
 
@@ -41,7 +40,7 @@ def main() -> None:
     client = init_client()
 
     try:
-        reset_collection(client, collection_name)
+        # reset_collection(client, collection_name)
         logger.info(f"[OK] Reset collection '{collection_name}'")
         
         logger.info(f"[STEP 3] Ensuring collection '{collection_name}'")
