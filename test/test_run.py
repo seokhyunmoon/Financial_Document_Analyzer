@@ -5,7 +5,7 @@ import pandas as pd
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from graph.app import build_graph
+from graph.state import build_graph
 from utils.config import load_config
 from utils.logger import get_logger
 

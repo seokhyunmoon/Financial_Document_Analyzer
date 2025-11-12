@@ -14,13 +14,20 @@ class QAState(TypedDict, total=False):
     question_vector: List[float]
     hits: List[Dict[str, Any]]
     answer: Dict[str, Any]
+    topk: int
+    source_doc: Optional[str]
 
 def node_encode(state: QAState) -> QAState:
     state["question_vector"] = query_embeddings(state["question"])
     return state
 
 def node_retrieve(state: QAState) -> QAState:
-    state["hits"] = retrieve_topk(state["question"], state["question_vector"])
+    state["hits"] = retrieve_topk(
+        state["question"], 
+        state["question_vector"],
+        state["topk"],
+        state["source_doc"]
+        )
     return state
 
 # def node_rerank(state: QAState) -> QAState:

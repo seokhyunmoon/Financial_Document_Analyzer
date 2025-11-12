@@ -15,7 +15,9 @@ logger = get_logger(__name__)
 
 def retrieve_topk(
     question: str, 
-    question_vector: List[float],
+    question_vector: Optional[List[float]],
+    topk: Optional[int] = None,
+    source_doc: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     Retrieves the top-k relevant document chunks from the vector database
@@ -24,7 +26,8 @@ def retrieve_topk(
     Args:
         question: The input query string.
         question_vector: A list of floats representing the embedding vector of the query.
-
+        topk: top-k to retrieve.
+        source_doc: A string for filtering by doc Name (ex: "28" 또는 "PEPSICO_2022_10K")
 
     Returns:
         A list of dictionaries, where each dictionary contains the metadata
@@ -44,17 +47,23 @@ def retrieve_topk(
     client = init_client()
     try:
         collection = client.collections.get(collection_name)
+        
+        w_filter = None
+        if source_doc:
+            w_filter = Filter.by_property("source_doc").equal(source_doc)
 
         res = collection.query.near_vector(
             near_vector=question_vector,
             limit=topk,
+            filters=w_filter,
             return_properties=[
                 "source_doc","doc_id","chunk_id","element_type","text","page_start","page_end"
             ],
+            include_vector=False,
         )
 
         hits: List[Dict[str, Any]] = []
-        for o in res.objects:
+        for o in getattr(res, "objects", []):
             props = o.properties or {}
             hits.append({
                 "chunk_id":   props.get("chunk_id"),
