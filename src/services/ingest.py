@@ -20,7 +20,7 @@ def _safe_stem(name: str) -> str:
     stem = Path(name).stem
     return "".join(ch for ch in stem if ch.isalnum() or ch in ("_", "-", "."))[:128]
 
-def _save_uploaded_to_raw(uploaded: Union[Path, "UploadedFile"], raw_dir: Path) -> Path:
+def _save_uploaded_to_local(uploaded: Union[Path, "UploadedFile"], raw_dir: Path) -> Path:
     """Streamlit UploadedFile 또는 Path를 받아 raw_dir에 저장하고 저장 경로를 반환."""
     raw_dir.mkdir(parents=True, exist_ok=True)
     # Streamlit UploadedFile 은 .name, .read() 제공
@@ -101,7 +101,7 @@ def ingest_files(
 
         results: List[Dict[str, Any]] = []
         for up in uploaded_files:
-            dest = _save_uploaded_to_raw(up, raw_dir)
+            dest = _save_uploaded_to_local(up, raw_dir)
             logger.info(f"[INGEST] {dest.name}")
             info = ingest_single_pdf(dest, out_dirs)
             upload_objects(client, collection, info["rows"])
