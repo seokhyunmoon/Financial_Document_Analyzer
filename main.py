@@ -73,20 +73,30 @@ if prompt := st.chat_input("Send a message..."):
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response) # Display final response without cursor
 
-            # Hits & Citations for details
-            hits = result.get("hits", []) or []
-            cites = answer_dict.get("citations", []) or []
+            # Show sources
+            # hits = result.get("hits", []) or []
             
-            details = {"hits": hits, "citations": cites}
-            if hits:
-                with st.expander("Show Sources"):
-                    st.json(details)
+            # details = {"hits": hits}
+            # if hits:
+            #     with st.expander("Show Sources"):
+            #         st.json(details)
+            
+            sources = answer_dict.get("citations", []) or []
+            # (선택) 상단에 인덱스만 간단히 표기
+            idxs = [c.get("i") for c in sources if isinstance(c, dict) and "i" in c]
+            if idxs:
+                st.caption(f"Cited Sources: {idxs}")
+
+            # 토글엔 '사용된 소스'만 JSON으로
+            if sources:
+                with st.expander("Sources (used)"):
+                    st.json(sources)        
     
     # Add assistant response to chat history
     st.session_state.messages.append({
         "role": "assistant", 
         "content": answer_text,
-        "details": details
+        "details": sources
     })
     st.rerun()
 

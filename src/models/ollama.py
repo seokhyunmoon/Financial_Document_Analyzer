@@ -1,8 +1,14 @@
-# src/graph/modesl/ollama.py
-from typing import List, Dict
+# src/graph/models/ollama.py
+from typing import List, Dict, Any
 from ollama import Client
+from pydantic import BaseModel
 
-def _generate_ollama(model_name: str, messages: List[Dict[str,str]], gsec: dict) -> str:
+# Ollama response format
+class QAResponse(BaseModel):
+    answer: str
+    citations: list[int] = []
+
+def _generate_ollama(model_name: str, messages: List[Dict[str,str]], gsec: dict) -> Dict[str, Any]:
     
     """Generates a response using an Ollama chat model.
 
@@ -22,8 +28,14 @@ def _generate_ollama(model_name: str, messages: List[Dict[str,str]], gsec: dict)
         #     "top_k": gsec.get("top_k", 10),
         #     "top_p": gsec.get("top_p", 0.8),
         # }
-        response = client.chat(model=model_name, messages=messages, options={})
-        return response['message']['content']
+        response = client.chat(
+            model=model_name, 
+            messages=messages, 
+            format=QAResponse.model_json_schema(),
+            options={}
+        )
+        return QAResponse.model_validate_json(response.message.content).model_dump()
+    
     finally:
         # Manually close the underlying httpx client to prevent ResourceWarning
         if hasattr(client, '_client') and client._client:

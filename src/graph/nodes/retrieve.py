@@ -27,7 +27,7 @@ def retrieve_topk(
         question: The input query string.
         question_vector: A list of floats representing the embedding vector of the query.
         topk: top-k to retrieve.
-        source_doc: A string for filtering by doc Name (ex: "28" 또는 "PEPSICO_2022_10K")
+        source_doc: A string for filtering by doc Name (ex: "PEPSICO_2022_10K")
 
     Returns:
         A list of dictionaries, where each dictionary contains the metadata

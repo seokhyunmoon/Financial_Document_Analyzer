@@ -1,14 +1,13 @@
 system: |
   please answer the question below by referencing the list of sources provided after the question; if the question can not be answered just respond 'No answer'.
   The sources are listed after "Sources:".
-  Return the answer in the following format:
-  Answer: <your answer here> 
+  Return ONLY a JSON object with keys: "answer" (string) and "citations" (array of integers referring to the [i] indices).
 
 user: |
   Question: {{ question }}
 
   Sources:
   {% for i, k in topk %}
-  [ Chunk ID:{{k.chunk_id}} | Document:{{k.source_doc}} | Page:{{ k.page_start }} | Element:{{k.element}}]
+  [{{ i }}] {{ k.doc_id }} p{{ k.page_start }}-{{ k.page_end }}
   {{ k.text }}
   {% endfor %}
