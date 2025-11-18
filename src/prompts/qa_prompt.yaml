@@ -3,8 +3,6 @@ system: |
   The sources are listed after "Sources:".
   Return the answer in the following format:
   Answer: <your answer here> 
-  [Chunk ID:x|Doc:y|pg:z|Element:w]
-  where x is the chunk_id, y is the source document name, z is the starting page number, and w is the element type .
 
 user: |
   Question: {{ question }}
