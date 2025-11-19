@@ -22,6 +22,7 @@ dependencies = [
     "seaborn>=0.13.2",
     "sentence-transformers>=5.1.2",
     "streamlit>=1.51.0",
+    "tiktoken>=0.12.0",
     "torch>=2.9.0",
     "tqdm>=4.67.1",
     "unstructured[local-inference,pdf]>=0.18.15",
