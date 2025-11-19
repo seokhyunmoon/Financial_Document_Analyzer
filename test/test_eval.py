@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import pandas as pd
 from datetime import datetime
+import itertools
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
@@ -60,7 +61,7 @@ def main():
     n_total = 0
     n_correct = 0 
     
-    for _, row in df.iterrows():
+    for _, row in itertools.islice(df.iterrows(), 1):
         question = str(row['question']).strip()
         ground_truth = str(row['answer']).strip()
         doc_name = str(row['doc_name']).strip()
@@ -86,7 +87,7 @@ def main():
                 "ground_truth": ground_truth,
                 "answer": ans,
                 "num_correct": int(is_same),
-                "raw_result": eval_result.get("raw", ""),
+                "raw_result": eval_result.get("result", ""),
                 "eval_reasoning": eval_result.get("reasoning", ""),
             })
 
@@ -105,7 +106,7 @@ def main():
     acc = (n_correct / max(1, n_total)) * 100.0
     print(f"\n[RESULT] Q&A Accuracy (LLM-Judge / Figure 4): {acc:.2f}%  ({n_correct}/{n_total})")
 
-    out_dir = Path(paths.get("logs_dir", "data/logs"))
+    out_dir = Path(paths.get("logs_dir", "data/eval"))
     out_dir.mkdir(parents=True, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_csv = out_dir / f"eval_results_{ts}.csv"

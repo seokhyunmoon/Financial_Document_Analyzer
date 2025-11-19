@@ -1,6 +1,7 @@
 #src/prompts/eval_prompt.yaml
 user: |
-  Begin with True or False. Are the two following answers (Answer 1 and Answer 2) the same with respect to the question between single quotes '{{ question }}'?
+  Begin with True or False and state the reasoing on the newline.
+  Are the two following answers (Answer 1 and Answer 2) the same with respect to the question between single quotes '{{ question }}'?
 
   Answer 1: '{{ ground_truth }}'
   Answer 2: '{{ generated_answer }}'

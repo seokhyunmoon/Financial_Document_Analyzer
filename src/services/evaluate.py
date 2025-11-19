@@ -37,7 +37,7 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     
     result = (response.get("result") or "").strip()
-    first = result.split()[0].strip(" .,:;").lower() if result else ""
+    first = result.split()[0].strip("\n").lower() if result else ""
     is_same = True if first == "true" else False
     
     return {"result": result, "is_same": is_same, "reasoning": response.get("reasoning")}
