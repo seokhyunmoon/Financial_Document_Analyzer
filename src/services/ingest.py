@@ -21,9 +21,7 @@ def _safe_stem(name: str) -> str:
     return "".join(ch for ch in stem if ch.isalnum() or ch in ("_", "-", "."))[:128]
 
 def _save_uploaded_to_local(uploaded: Union[Path, "UploadedFile"], raw_dir: Path) -> Path:
-    """Streamlit UploadedFile 또는 Path를 받아 raw_dir에 저장하고 저장 경로를 반환."""
     raw_dir.mkdir(parents=True, exist_ok=True)
-    # Streamlit UploadedFile 은 .name, .read() 제공
     if hasattr(uploaded, "read"):
         filename = getattr(uploaded, "name", "uploaded.pdf")
         dest = raw_dir / _safe_stem(filename)
@@ -41,7 +39,6 @@ def _save_uploaded_to_local(uploaded: Union[Path, "UploadedFile"], raw_dir: Path
         return dest
 
 def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, Any]:
-    """elements → chunks → embeddings → JSONL (DB Upsert is excluded)."""
     t0 = time.time()
     doc_id = _safe_stem(pdf_path.name)
 
@@ -74,7 +71,6 @@ def ingest_files(
     uploaded_files: Iterable[Union[Path, "UploadedFile"]],
     reset: bool = False,
 ) -> List[Dict[str, Any]]:
-    """여러 PDF 업로드 → raw_dir 저장 → 처리 → Weaviate 업서트."""
     cfg = load_config()
     paths = cfg.get("paths", {})
     raw_dir = Path(paths.get("raw_dir", "data/pdfs")).resolve()
@@ -91,7 +87,6 @@ def ingest_files(
     client = init_client()
     try:
         if reset:
-            # 일부 코드베이스에서 시그니처 차이가 있을 수 있어 안전 가드
             try:
                 reset_collection(client, collection)
             except TypeError:

@@ -110,7 +110,7 @@ def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
     
     # generate answer
     if provider == "ollama":
-        response = _generate_ollama(model, message, gsec)
+        response = _generate_ollama(model, message)
     else:
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     

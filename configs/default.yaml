@@ -1,10 +1,11 @@
 paths:
   finanacebench: data/finanacebench
+  logs_dir: data/logs
   raw_dir: data/pdfs
   elements_dir: data/processed/elements
   chunks_dir: data/processed/chunks
   embed_dir: data/processed/embeddings
-  logs_dir: data/log
+  
 
 # /src/graph/nodes/elements.py
 partitioning:
@@ -13,6 +14,7 @@ partitioning:
   languages:
     - eng
   infer_table_structure: true
+
 
 cleaning:
   apply_unicode_quotes: true
@@ -24,15 +26,18 @@ cleaning:
     trailing_punctuation: false
     lowercase: false
 
+
 # /src/graph/nodes/chunks.py
 chunking:
   min_chars: 2048
+
 
 # /src/graph/nodes/embed.py
 embedding:
   model_name: Qwen/Qwen3-Embedding-4B
   batch_size: 8
   normalize_embeddings: true
+
 
 # /src/graph/nodes/vectordb.py
 vectordb:
@@ -46,9 +51,11 @@ vectordb:
     concurrent_requests: 4
     upsert: true
 
+
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
+
 
 # /src/graph/nodes/generate.py
 generate:
