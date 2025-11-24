@@ -38,10 +38,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--topk", type=int, default=10, help="Retrieval top-k passed to LangGraph"
     )
+    parser.add_argument(
+        "--retriever-mode",
+        choices=["vector", "keyword", "hybrid"],
+        default=None,
+        help="Retrieval mode override (defaults to config qa.retriever_mode)",
+    )
     return parser.parse_args()
 
 
-def iter_questions(dataset_path: Path, allowed_docs: Optional[Iterable[str]], limit: Optional[int]):
+def iter_questions(dataset_path: Path, allowed_docs: Optional[Iterable[str]]):
     allowed = None
     if allowed_docs:
         allowed = {name.strip() for name in allowed_docs if name.strip()}
@@ -55,9 +61,6 @@ def iter_questions(dataset_path: Path, allowed_docs: Optional[Iterable[str]], li
                 continue
             yield row
             count += 1
-            if limit and count >= limit:
-                break
-
 
 def main() -> None:
     args = parse_args()
@@ -86,7 +89,7 @@ def main() -> None:
     errors = 0
 
     with out_path.open("w", encoding="utf-8") as out_f:
-        for row in iter_questions(dataset_path, docs, args.limit):
+        for row in iter_questions(dataset_path, docs):
             question = str(row.get("question", "")).strip()
             ground_truth = str(row.get("answer", "")).strip()
             doc_name = str(row.get("doc_name", "")).strip()
