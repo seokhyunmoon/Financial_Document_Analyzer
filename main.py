@@ -9,10 +9,7 @@ import re
 sys.path.append(str(Path(__file__).resolve().parents[0] / "src"))
 from graph.state import compiled_graph, QAState
 from utils.inventory import list_available_documents
-from utils.logger import get_logger
 from services.ingest import ingest_files
-
-logger = get_logger(__name__)
 
 st.set_page_config(page_title="Financial Document Analyzer", page_icon="💵", layout="wide")
 

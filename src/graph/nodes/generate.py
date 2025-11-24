@@ -115,7 +115,7 @@ def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     
     # Get answer + citations from generated response
-    answer = response.get("answer", "") # {'answer': str, 'citations_idx': List[int]}
+    answer = response.get("answer", "") # {'answer': str, 'citations': List[int]}
     idxs   = [int(x) for x in (response.get("citations") or []) if 1 <= int(x) <= len(hits)]
 
     if not idxs:

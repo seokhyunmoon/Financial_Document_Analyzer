@@ -17,13 +17,18 @@ from ingestion.vectorstore import (
     upload_objects,
 )
 
+try:  # Streamlit is available in the app, but provide a fallback for pure CLI usage.
+    from streamlit.runtime.uploaded_file_manager import UploadedFile
+except ModuleNotFoundError:  # pragma: no cover
+    from typing import Any as UploadedFile
+
 logger = get_logger(__name__)
 
 def _safe_stem(name: str) -> str:
     stem = Path(name).stem
     return "".join(ch for ch in stem if ch.isalnum() or ch in ("_", "-", "."))[:128]
 
-def _save_uploaded_to_local(uploaded: Union[Path, "UploadedFile"], raw_dir: Path) -> Path:
+def _save_uploaded_to_local(uploaded: Union[Path, UploadedFile], raw_dir: Path) -> Path:
     raw_dir.mkdir(parents=True, exist_ok=True)
     if hasattr(uploaded, "read"):
         filename = getattr(uploaded, "name", "uploaded.pdf")
@@ -66,14 +71,15 @@ def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, An
         "n_chunks": len(chunks),
         "n_vectors": len(embedded),
         "elapsed_sec": round(time.time() - t0, 2),
-        "rows": embedded,  # DB 업서트 입력
+        "rows": embedded,
         "paths": {"elements": e_out, "chunks": c_out, "embeddings": m_out},
     }
 
 def ingest_files(
-    uploaded_files: Iterable[Union[Path, "UploadedFile"]],
+    uploaded_files: Iterable[Union[Path, UploadedFile]],
     reset: bool = False,
 ) -> List[Dict[str, Any]]:
+    
     cfg = load_config()
     paths = cfg.get("paths", {})
     raw_dir = Path(paths.get("raw_dir", "data/pdfs")).resolve()
@@ -82,12 +88,15 @@ def ingest_files(
         "chunks_dir":   Path(paths.get("chunks_dir", "data/processed/chunks")).resolve(),
         "embeddings_dir": Path(paths.get("embeddings_dir", "data/processed/embeddings")).resolve(),
     }
+    
     for p in out_dirs.values():
         p.mkdir(parents=True, exist_ok=True)
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     collection = get_section(cfg, "vectordb").get("collection_name", "FinancialDocChunk")
+    
     client = init_client()
+    
     try:
         if reset:
             try:
@@ -105,5 +114,6 @@ def ingest_files(
             upload_objects(client, collection, info["rows"])
             results.append(info)
         return results
+    
     finally:
         close_client(client)
