@@ -66,4 +66,5 @@ qa:
 # /src/graph/nodes/generate.py
 generate:
   provider: ollama
-  model_name: qwen3:8b
+  model_name: llama3.1:8b
+  # model_name: qwen3:8b

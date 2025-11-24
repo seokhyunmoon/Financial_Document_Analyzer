@@ -18,7 +18,7 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
     cfg = load_config()
     gsec = get_section(cfg, "generate")
     provider = gsec.get("provider", "ollama")
-    model = gsec.get("model", "qwen3:8b")
+    model = gsec.get("model_name", "qwen3:8b")
     
     # load prompt and build message
     prompt = load_prompt("eval_prompt")
