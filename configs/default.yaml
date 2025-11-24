@@ -47,8 +47,11 @@ vectordb:
     port: 8080
     grpc_port: 50051
     skip_init_checks: true
+  embedded:
     persistence_data_path: "data/weaviate"
     binary_path: "/home/moon/.cache/weaviate-embedded"
+    env:
+      LOG_LEVEL: error
   upload:
     batch_size: 100
     concurrent_requests: 4

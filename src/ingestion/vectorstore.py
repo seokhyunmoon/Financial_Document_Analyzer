@@ -34,23 +34,23 @@ def init_client(skip_init_checks: Optional[bool] = None) -> weaviate.WeaviateCli
     cfg = load_config()
     vsec = get_section(cfg, "vectordb")
     use_docker = vsec.get("use_docker", True)  # False = embedded, True = external/docker
-    
+    embedded_cfg = get_section(vsec, "embedded")
+    embedded_env = get_section(embedded_cfg, "env") if embedded_cfg else None
+
     init_cfg = get_section(vsec, "init")
     host = init_cfg.get("host", "localhost")
     port = init_cfg.get("port", 8080)
     grpc_port = init_cfg.get("grpc_port", 50051)
     cfg_skip = init_cfg.get("skip_init_checks", False)
 
-    # Optional, only used in embedded mode
-    persistence_data_path = init_cfg.get("persistence_data_path", None)
-    binary_path = init_cfg.get("binary_path", None)
+    persistence_data_path = None
+    binary_path = None
+    if embedded_cfg:
+        persistence_data_path = embedded_cfg.get("persistence_data_path")
+        binary_path = embedded_cfg.get("binary_path")
     
     if skip_init_checks is None:
         skip_init_checks = cfg_skip
-
-    # Optional, only used in embedded mode
-    persistence_data_path = init_cfg.get("persistence_data_path", None)
-    binary_path = init_cfg.get("binary_path", None)
 
     logger.info(
         f"[INFO] Connecting Weaviate at {host}:{port} (gRPC={grpc_port}, "
@@ -82,6 +82,7 @@ def init_client(skip_init_checks: Optional[bool] = None) -> weaviate.WeaviateCli
                 additional_config=additional_cfg,
                 persistence_data_path=persistence_data_path,
                 binary_path=binary_path,
+                environment_variables=embedded_env or None,
             )
     except Exception as e:
         logger.warning(f"[ERROR] Failed to initialize Weaviate client: {e}")

@@ -103,20 +103,20 @@ if prompt := st.chat_input("Send a message..."):
 st.divider()
 
 # --- Ingest UI ---
-st.header("Ingest Documents")
+st.header("Upload Financial Documents")
 files = st.file_uploader("Upload PDF(s)", type=["pdf"], accept_multiple_files=True)
 
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("Run Ingest", type="primary", disabled=(not files), use_container_width=True):
+    if st.button("Upload", type="primary", disabled=(not files), use_container_width=True):
         with st.status("Ingest running...", expanded=True) as status:
             try:
                 ingest_files(files, reset=False)
-                st.success("Ingest finished.")
+                st.success("Uploaded")
                 st.rerun() # Rerun to update the list of indexed documents
             except Exception as e:
-                st.error(f"Ingest failed: {e}")
+                st.error(f"Upload failed: {e}")
 
 with col2:
     if st.session_state.get("confirm_reset", False):
@@ -143,7 +143,7 @@ with col2:
             st.rerun()
 
 st.divider()
-st.subheader("Indexed documents")
+st.subheader("Documents")
 docs_ingest = list_available_documents()
 for did, cnt in docs_ingest:
     st.write(f"- **{did}** — {cnt} chunks")
