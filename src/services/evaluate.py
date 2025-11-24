@@ -2,7 +2,7 @@
 
 from typing import Dict, Any
 from pydantic import BaseModel
-from models.ollama import _generate_ollama, ollama_chat_structured
+from adapters.ollama import _generate_ollama, ollama_chat_structured
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 from utils.prompts import load_prompt, render_prompt

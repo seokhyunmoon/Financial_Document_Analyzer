@@ -11,7 +11,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 from utils.logger import get_logger
 from utils.config import load_config, get_section, resolve_path
 from utils.files import read_jsonl
-from graph.nodes.vectordb import (
+from ingestion.vectorstore import (
     init_client,
     close_client,
     ensure_collection,

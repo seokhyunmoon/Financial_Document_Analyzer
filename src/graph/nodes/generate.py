@@ -6,7 +6,7 @@ This module defines nodes for generating natural language answers based on a use
 """
 from typing import List, Dict, Any
 import re
-from models.ollama import _generate_ollama
+from adapters.ollama import _generate_ollama
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 from utils.prompts import load_prompt, render_prompt

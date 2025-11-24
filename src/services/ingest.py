@@ -6,12 +6,15 @@ import time
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 from utils.files import write_jsonl
-from graph.nodes.elements import extract_elements
-from graph.nodes.chunks import merge_elements_to_chunks
-from graph.nodes.embed import generate_embeddings
-from graph.nodes.vectordb import (
-    init_client, close_client,
-    ensure_collection, reset_collection, upload_objects,
+from ingestion.elements import extract_elements
+from ingestion.chunking import merge_elements_to_chunks
+from ingestion.embeddings import generate_embeddings
+from ingestion.vectorstore import (
+    init_client,
+    close_client,
+    ensure_collection,
+    reset_collection,
+    upload_objects,
 )
 
 logger = get_logger(__name__)

@@ -4,7 +4,7 @@ import jsonlines
 # Adjust path so we can import from src
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from graph.nodes.embed import generate_embeddings
+from ingestion.embeddings import generate_embeddings
 from utils.files import write_jsonl
 
 pdf = Path("data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl")  # For testing a single file

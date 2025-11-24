@@ -2,7 +2,7 @@ import sys, json
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from graph.nodes.elements import extract_elements
+from ingestion.elements import extract_elements
 from utils.config import load_config, get_section
 
 def main():

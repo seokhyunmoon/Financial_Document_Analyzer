@@ -8,7 +8,7 @@ from typing import List, Dict, Any, Optional
 from weaviate.classes.query import Filter
 from utils.logger import get_logger
 from utils.config import load_config, get_section
-from graph.nodes.vectordb import init_client, close_client
+from ingestion.vectorstore import init_client, close_client
 from graph.nodes.query import query_embeddings 
 
 logger = get_logger(__name__)
