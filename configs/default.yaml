@@ -41,11 +41,14 @@ embedding:
 
 # /src/graph/nodes/vectordb.py
 vectordb:
+  use_docker: false
   init:
     host: localhost
     port: 8080
     grpc_port: 50051
     skip_init_checks: true
+    persistence_data_path: "data/weaviate"
+    binary_path: "/home/moon/.cache/weaviate-embedded"
   upload:
     batch_size: 100
     concurrent_requests: 4

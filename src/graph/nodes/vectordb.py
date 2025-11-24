@@ -33,28 +33,65 @@ def init_client(skip_init_checks: Optional[bool] = None) -> weaviate.WeaviateCli
     """
     cfg = load_config()
     vsec = get_section(cfg, "vectordb")
+    use_docker = vsec.get("use_docker", True)  # False = embedded, True = external/docker
+    
     init_cfg = get_section(vsec, "init")
     host = init_cfg.get("host", "localhost")
     port = init_cfg.get("port", 8080)
     grpc_port = init_cfg.get("grpc_port", 50051)
     cfg_skip = init_cfg.get("skip_init_checks", False)
+
+    # Optional, only used in embedded mode
+    persistence_data_path = init_cfg.get("persistence_data_path", None)
+    binary_path = init_cfg.get("binary_path", None)
+    
     if skip_init_checks is None:
         skip_init_checks = cfg_skip
 
-    logger.info(f"[INFO] Connecting Weaviate at {host}:{port} (gRPC={grpc_port}) ...")
-    client = weaviate.connect_to_local(
-        host=host,
-        port=port,
-        grpc_port=grpc_port,
-        additional_config=AdditionalConfig(
-            timeout=Timeout(init=30, query=60, insert=60)
-        ),
-        skip_init_checks=skip_init_checks,
+    # Optional, only used in embedded mode
+    persistence_data_path = init_cfg.get("persistence_data_path", None)
+    binary_path = init_cfg.get("binary_path", None)
+
+    logger.info(
+        f"[INFO] Connecting Weaviate at {host}:{port} (gRPC={grpc_port}, "
+        f"use_docker={use_docker}) ..."
     )
 
+    additional_cfg = AdditionalConfig(
+        timeout=Timeout(init=30, query=60, insert=60)
+    )
+
+    client: weaviate.WeaviateClient
+
+    try:
+        if use_docker:
+            # Expect an external Weaviate (Docker, binary, etc.) on host:port
+            client = weaviate.connect_to_local(
+                host=host,
+                port=port,
+                grpc_port=grpc_port,
+                additional_config=additional_cfg,
+                skip_init_checks=skip_init_checks,
+            )
+        else:
+            # Start (or reuse) embedded Weaviate
+            client = weaviate.connect_to_embedded(
+                hostname=host,
+                port=port,
+                grpc_port=grpc_port,
+                additional_config=additional_cfg,
+                persistence_data_path=persistence_data_path,
+                binary_path=binary_path,
+            )
+    except Exception as e:
+        logger.warning(f"[ERROR] Failed to initialize Weaviate client: {e}")
+        raise
+
+    # Optionally verify readiness (works for both embedded & local)
     if not skip_init_checks and not client.is_ready():
         client.close()
-        raise RuntimeError("Weaviate is not ready.")
+        raise RuntimeError("[ERROR] Weaviate is not ready.")
+
     logger.info("[OK] Connected to Weaviate")
     return client
 
