@@ -14,10 +14,11 @@ from graph.nodes.query import query_embeddings
 logger = get_logger(__name__)
 
 def retrieve_topk(
-    question: str, 
+    question: str,
     question_vector: Optional[List[float]],
     topk: Optional[int] = None,
     source_doc: Optional[str] = None,
+    mode: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
     """
     Retrieves the top-k relevant document chunks from the vector database
@@ -33,15 +34,20 @@ def retrieve_topk(
         A list of dictionaries, where each dictionary contains the metadata
         and text of a retrieved document chunk.
     """
-    if question_vector is None:
-        question_vector = query_embeddings(question)
-    
-    # load config
     cfg = load_config()
     qsec = get_section(cfg, "qa")
     vsec = get_section(cfg, "vectordb")
-    topk = qsec.get("topk", 10)
+    topk = topk or qsec.get("topk", 10)
+    retriever_mode = (mode or qsec.get("retriever_mode", "vector")).lower()
+    hybrid_alpha = float(qsec.get("hybrid_alpha", 0.5))
     collection_name = vsec.get("collection_name", "FinancialDocChunk")
+
+    needs_vector = retriever_mode in ("vector", "hybrid")
+    if needs_vector:
+        if question_vector is None:
+            question_vector = query_embeddings(question)
+    else:
+        question_vector = None
 
     # 2) search
     client = init_client()
@@ -52,15 +58,42 @@ def retrieve_topk(
         if source_doc:
             w_filter = Filter.by_property("source_doc").equal(source_doc)
 
-        res = collection.query.near_vector(
-            near_vector=question_vector,
-            limit=topk,
-            filters=w_filter,
-            return_properties=[
-                "source_doc","doc_id","chunk_id","element_type","text","page_start","page_end"
-            ],
-            include_vector=False,
-        )
+        return_props = [
+            "source_doc",
+            "doc_id",
+            "chunk_id",
+            "element_type",
+            "text",
+            "page_start",
+            "page_end",
+        ]
+
+        if retriever_mode == "vector":
+            res = collection.query.near_vector(
+                near_vector=question_vector,
+                limit=topk,
+                filters=w_filter,
+                return_properties=return_props,
+                include_vector=False,
+            )
+        elif retriever_mode == "keyword":
+            res = collection.query.bm25(
+                query=question,
+                limit=topk,
+                filters=w_filter,
+                return_properties=return_props,
+            )
+        elif retriever_mode == "hybrid":
+            res = collection.query.hybrid(
+                query=question,
+                vector=question_vector,
+                alpha=hybrid_alpha,
+                limit=topk,
+                filters=w_filter,
+                return_properties=return_props,
+            )
+        else:
+            raise ValueError(f"Unsupported retriever_mode: {retriever_mode}")
 
         hits: List[Dict[str, Any]] = []
         for o in getattr(res, "objects", []):
@@ -74,7 +107,9 @@ def retrieve_topk(
                 "page_end":   props.get("page_end"),
                 "text":       props.get("text"),
             })
-        logger.info(f"[OK] Retrieved {len(hits)}/{topk} hits from '{collection_name}'")
+        logger.info(
+            f"[OK] Retrieved {len(hits)}/{topk} hits from '{collection_name}' mode={retriever_mode}"
+        )
         return hits
     finally:
         close_client(client)

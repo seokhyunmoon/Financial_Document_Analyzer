@@ -38,12 +38,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--topk", type=int, default=10, help="Retrieval top-k passed to LangGraph"
     )
-    parser.add_argument(
-        "--retriever-mode",
-        choices=["vector", "keyword", "hybrid"],
-        default=None,
-        help="Retrieval mode override (defaults to config qa.retriever_mode)",
-    )
     return parser.parse_args()
 
 
@@ -106,7 +100,13 @@ def main() -> None:
                 "question_reasoning": question_reasoning,
             }
             try:
-                result = app.invoke({"question": question, "topk": args.topk, "source_doc": doc_name})
+                result = app.invoke(
+                    {
+                        "question": question,
+                        "topk": args.topk,
+                        "source_doc": doc_name,
+                    }
+                )
                 answer_block = result.get("answer", {}) or {}
                 hits: List[Dict[str, Any]] = result.get("hits", []) or []
                 model_answer = answer_block.get("answer", "")

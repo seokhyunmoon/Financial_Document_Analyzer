@@ -61,6 +61,8 @@ vectordb:
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
+  retriever_mode: hybrid #vector, keyword, hybrid
+  hybrid_alpha: 0.5
 
 
 # /src/graph/nodes/generate.py
