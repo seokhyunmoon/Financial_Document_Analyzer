@@ -63,6 +63,9 @@ qa:
   topk: 10
   retriever_mode: hybrid #vector, keyword, hybrid
   hybrid_alpha: 0.5
+  rerank:
+    enabled: true
+    topk: 10
 
 
 # /src/graph/nodes/generate.py

@@ -76,7 +76,7 @@ def main() -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     logger.info("Building LangGraph (QA)...")
-    app = build_graph(use_rerank=False)
+    app = build_graph()
 
     processed = 0
     correct = 0
