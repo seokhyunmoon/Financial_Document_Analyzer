@@ -128,15 +128,16 @@ def main() -> None:
                     ground_truth=ground_truth,
                     generated_answer=model_answer,
                 )
-                is_same = bool(eval_result.get("is_same"))
-                correct += 1 if is_same else 0
+                classification = eval_result.get("classification")
+                is_correct = classification == "CORRECT"
+                correct += 1 if is_correct else 0
 
                 record.update(
                     {
                         "answer": model_answer,
                         "citations": citations,
                         "hits": hits,
-                        "eval_is_same": is_same,
+                        "eval_classification": classification,
                         "eval_reasoning": eval_result.get("reasoning"),
                     }
                 )
@@ -148,7 +149,7 @@ def main() -> None:
                         "answer": "",
                         "citations": [],
                         "hits": [],
-                        "eval_is_same": False,
+                        "eval_classification": "ERROR",
                         "error": str(exc),
                     }
                 )

@@ -1,14 +1,28 @@
 # src/prompts/eval_prompt.yaml
-user: |
-  Compare Answer 1 (ground truth) and Answer 2 (model output) for the question '{{ question }}'.
-  Output format:
-  - First word: "True" if the answers convey the same meaning, otherwise "False".
-  - Second line: short justification describing the key difference or confirming the match.
+system: |
+  You are an expert evaluation agent. Your task is to compare a "Ground Truth" answer with a "Model Answer" for a given question and classify the model's performance based on the categories below.
 
-  Evaluation rules:
-  - Minor wording/formatting differences should be treated as equivalent if the meaning is preserved.
+  **Evaluation Categories:**
+
+  1.  **CORRECT:** The Model Answer is factually accurate, complete, and conveys the same meaning as the Ground Truth.
+  2.  **PARTIALLY_CORRECT:** The Model Answer is factually correct but is incomplete or misses important context present in the Ground Truth.
+  3.  **DIFFERENT_ANSWER:** The Model Answer is factually correct but answers a slightly different question or is at a different level of detail (e.g., provides country details when regions were asked).
+  4.  **INCORRECT:** The Model Answer contains factual errors, performs calculations incorrectly, or directly contradicts the Ground Truth.
+  5.  **NO_ANSWER:** The Model Answer provides no information or incorrectly claims the information is not available in the source documents.
+
+  **Evaluation Rules:**
+  - Be objective. Your judgment should be based solely on the provided text.
+  - Minor wording or formatting differences should not impact the evaluation if the core meaning is preserved.
   - Numeric values are considered equal if they differ by at most ±0.1 absolute or ±3% relative.
-  - Ignore citation formatting differences; focus only on content.
+  - Ignore any source citations (e.g., `[i]`) in the answers.
 
-  Answer 1: '{{ ground_truth }}'
-  Answer 2: '{{ generated_answer }}'
+  **Output Format:**
+  You MUST return ONLY a JSON object with two keys:
+  - "classification": (string) One of the five categories: CORRECT, PARTIALLY_CORRECT, DIFFERENT_ANSWER, INCORRECT, NO_ANSWER.
+  - "reasoning": (string) A concise, one-sentence justification for your classification.
+
+user: |
+  Question: '{{ question }}'
+
+  Ground Truth: '{{ ground_truth }}'
+  Model Answer: '{{ generated_answer }}'

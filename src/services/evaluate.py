@@ -1,8 +1,8 @@
 # src/services/evaluate.py
-
+import json
 from typing import Dict, Any
 from pydantic import BaseModel
-from adapters.ollama import _generate_ollama, ollama_chat_structured
+from adapters.ollama import ollama_chat_structured
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 from utils.prompts import load_prompt, render_prompt
@@ -10,8 +10,9 @@ from utils.prompts import load_prompt, render_prompt
 logger = get_logger(__name__)
 
 class EvalResponse(BaseModel):
-    result: str 
-    reasoning: str | None = None
+    """Pydantic model for the structured JSON output from the evaluation prompt."""
+    classification: str
+    reasoning: str
 
 def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict:
     """Compare generated answer with ground truth using an LLM judge.
@@ -22,7 +23,7 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
         generated_answer: Answer produced by the model.
 
     Returns:
-        Dict containing raw judge result, boolean equivalence, and reasoning.
+        Dict containing the evaluation classification and reasoning.
     """
     # load config
     cfg = load_config()
@@ -33,22 +34,36 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
     
     # load prompt and build message
     prompt = load_prompt("eval_prompt")
-    user = render_prompt(
+    system_prompt = prompt.get("system", "")
+    user_prompt = render_prompt(
         prompt["user"],
         question=question,
         ground_truth=ground_truth,
         generated_answer=generated_answer
     )
-    message = [{"role": "user",   "content": user}]
     
-    # generate answer
-    if provider == "ollama":
-        response = ollama_chat_structured(model, message, EvalResponse, think=think)
-    else:
-        raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
-    
-    result = (response.get("result") or "").strip()
-    first = result.split()[0].strip("\n").lower() if result else ""
-    is_same = True if first == "true" else False
-    
-    return {"result": result, "is_same": is_same, "reasoning": response.get("reasoning")}
+    # The new prompt has a dedicated system message.
+    message = []
+    if system_prompt:
+        message.append({"role": "system", "content": system_prompt})
+    message.append({"role": "user", "content": user_prompt})
+
+    try:
+        # The `ollama_chat_structured` helper attempts to parse the LLM's JSON
+        # output into the `EvalResponse` Pydantic model.
+        response_data = ollama_chat_structured(model, message, EvalResponse, think=think)
+        
+        if response_data:
+            return {
+                "classification": response_data.get("classification", "INCORRECT"),
+                "reasoning": response_data.get("reasoning", "Failed to get reasoning from evaluator.")
+            }
+
+    except Exception as e:
+        logger.error(f"Failed to evaluate response due to an error: {e}")
+
+    # Fallback response in case of parsing failure or other errors
+    return {
+        "classification": "INCORRECT",
+        "reasoning": "Failed to get a valid structured response from the evaluation model."
+    }

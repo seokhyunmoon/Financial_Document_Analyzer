@@ -78,4 +78,4 @@ generate:
 evaluate:
   provider: ollama
   model_name: gpt-oss:20b
-  think: medium
+  think: high
