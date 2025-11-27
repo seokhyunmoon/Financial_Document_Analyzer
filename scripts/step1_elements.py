@@ -6,6 +6,7 @@ from ingestion.elements import extract_elements
 from utils.config import load_config, get_section
 
 def main():
+    """Extract elements from a sample PDF and write them to JSONL."""
     # --- Configs ---
     config = load_config()
     paths = get_section(config, "paths")

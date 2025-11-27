@@ -16,6 +16,7 @@ SOURCE_DOC = "28"          # set to None to disable filtering
 PREVIEW_LEN = 400          # characters to preview per hit
 
 def main():
+    """Retrieve context chunks and generate an answer for the demo question."""
     logger.info(f"[STEP] Retrieve → question='{QUESTION}' (topk={TOPK}, source_doc={SOURCE_DOC})")
     hits = retrieve_topk(QUESTION, topk=TOPK, source_doc=SOURCE_DOC)
 

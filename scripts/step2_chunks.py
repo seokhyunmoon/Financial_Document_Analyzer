@@ -9,6 +9,7 @@ from ingestion.chunking import merge_elements_to_chunks
 
 
 def main():
+    """Convert extracted elements into chunks and save to JSONL."""
 
     input_path = Path("data/processed/elements/28_elements.jsonl")
 

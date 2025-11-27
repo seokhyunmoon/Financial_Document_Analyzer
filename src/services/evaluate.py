@@ -14,6 +14,16 @@ class EvalResponse(BaseModel):
     reasoning: str | None = None
 
 def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict:
+    """Compare generated answer with ground truth using an LLM judge.
+
+    Args:
+        question: The original question text.
+        ground_truth: Reference answer from the dataset.
+        generated_answer: Answer produced by the model.
+
+    Returns:
+        Dict containing raw judge result, boolean equivalence, and reasoning.
+    """
     # load config
     cfg = load_config()
     esec = get_section(cfg, "evaluate")

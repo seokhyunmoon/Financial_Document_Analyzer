@@ -13,9 +13,7 @@ from utils.logger import get_logger
 logger = get_logger(__name__)
 
 def main():
-    """
-    Runs a QA test against all documents found in the data/pdfs folder.
-    """
+    """Run LangGraph QA across all available local PDFs."""
     # 1. Load configuration and paths
     cfg = load_config()
     paths = cfg.get("paths", {})

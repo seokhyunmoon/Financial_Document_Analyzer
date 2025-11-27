@@ -19,15 +19,13 @@ logger = get_logger(__name__)
 _WS_RE = re.compile(r"\s+")
 
 def _norm_text(s: str) -> str:
-    """
-    Description:
-        Normalize whitespace to improve downstream chunking quality.
+    """Normalize whitespace to improve downstream chunking quality.
 
     Args:
-        s (str): Raw text.
+        s: Raw text.
 
     Returns:
-        str: Trimmed text with internal spaces collapsed.
+        Text with leading/trailing whitespace trimmed and internal whitespace collapsed.
     """
     s = s.strip()
     if not s:
@@ -35,15 +33,13 @@ def _norm_text(s: str) -> str:
     return _WS_RE.sub(" ", s)
 
 def _map_unstructured_category(category: Optional[str]) -> str:
-    """
-    Description:
-        Map Unstructured element categories to simplified types used in the paper.
+    """Map Unstructured element categories to simplified types.
 
     Args:
-        category (Optional[str]): Unstructured element category (e.g., "Title", "Table", "PageBreak").
+        category: Unstructured category (e.g., ``Title``, ``Table``).
 
     Returns:
-        str: One of {"title", "table", "text", "pagebreak"}.
+        One of ``title``, ``table``, or ``text``.
     """
     if not category:
         return "text"
@@ -55,26 +51,14 @@ def _map_unstructured_category(category: Optional[str]) -> str:
     return "text"
 
 def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
-    """
-    Description:
-        Extract structural elements from a PDF using the Unstructured library
-        and normalize them into the schema used by the structural chunking pipeline.
-        Configuration-driven strategy and cleaning settings applied.
+    """Extract and normalize structural elements from a PDF.
 
     Args:
-        doc_path (str): Absolute path to the PDF file.
-        doc_id (str): Identifier for the document (usually filename stem).
+        doc_path: Absolute path to the PDF file.
+        doc_id: Identifier for the document (usually filename stem).
 
     Returns:
-        List[Dict[str, Any]]:
-            A list of element dicts:
-            {
-              "source_doc": str,
-              "doc_id": str,
-              "type": "title" | "text" | "table",
-              "text": str,
-              "page": int | None,
-            }
+        List of normalized element dictionaries (type/text/page metadata).
     """
     cfg = load_config()
     ucfg = get_section(cfg, "partitioning")

@@ -25,10 +25,27 @@ except ModuleNotFoundError:  # pragma: no cover
 logger = get_logger(__name__)
 
 def _safe_stem(name: str) -> str:
+    """Return a filesystem-safe stem limited to 128 chars.
+
+    Args:
+        name: Original filename or path string.
+
+    Returns:
+        Sanitized stem string.
+    """
     stem = Path(name).stem
     return "".join(ch for ch in stem if ch.isalnum() or ch in ("_", "-", "."))[:128]
 
 def _save_uploaded_to_local(uploaded: Union[Path, UploadedFile], raw_dir: Path) -> Path:
+    """Persist an uploaded file to the raw PDF directory.
+
+    Args:
+        uploaded: UploadedFile from Streamlit or a filesystem Path.
+        raw_dir: Target raw directory.
+
+    Returns:
+        Path to the saved PDF on disk.
+    """
     raw_dir.mkdir(parents=True, exist_ok=True)
     if hasattr(uploaded, "read"):
         filename = getattr(uploaded, "name", "uploaded.pdf")
@@ -47,6 +64,15 @@ def _save_uploaded_to_local(uploaded: Union[Path, UploadedFile], raw_dir: Path) 
         return dest
 
 def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, Any]:
+    """Run full ingestion (elements → chunks → embeddings) for one PDF.
+
+    Args:
+        pdf_path: Location of the PDF to ingest.
+        out_dirs: Mapping of output directories for intermediate artifacts.
+
+    Returns:
+        Summary dictionary including counts, elapsed time, rows, and file paths.
+    """
     t0 = time.time()
     doc_id = _safe_stem(pdf_path.name)
 
@@ -79,6 +105,16 @@ def ingest_files(
     uploaded_files: Iterable[Union[Path, UploadedFile]],
     reset: bool = False,
 ) -> List[Dict[str, Any]]:
+    
+    """Ingest a collection of uploaded PDFs, optionally resetting the DB.
+
+    Args:
+        uploaded_files: Iterable of PDF uploads or file paths.
+        reset: Whether to drop and recreate the vector collection first.
+
+    Returns:
+        List of ingestion summaries per file.
+    """
     
     cfg = load_config()
     paths = cfg.get("paths", {})

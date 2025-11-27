@@ -14,6 +14,7 @@ from ingestion.vectorstore import init_client, close_client, ensure_collection, 
 logger = get_logger(__name__)
 
 def main():
+    """Smoke-test ingestion on a single PDF."""
     cfg = load_config()
     paths = cfg.get("paths", {})
     raw_dir = Path(paths.get("raw_dir", "data/pdfs"))

@@ -17,15 +17,13 @@ logger = get_logger(__name__)
 def merge_elements_to_chunks(
     elements: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
-    """
-    Description:
-        Merge extracted elements into structural chunks following the paper's §3.4 rules (papers/2402.05131v3.pdf).
+    """Merge extracted elements into structural chunks.
 
     Args:
-        elements (List[Dict[str, Any]]): List of elements from Unstructured (sorted by page and order).
+        elements: Elements from Unstructured (sorted by page/order).
 
     Returns:
-        List[Dict[str, Any]]: List of merged chunk dictionaries with metadata.
+        List of merged chunk dictionaries with metadata.
     """
 
     # load configuration

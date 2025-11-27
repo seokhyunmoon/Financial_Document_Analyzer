@@ -20,19 +20,17 @@ def retrieve_topk(
     source_doc: Optional[str] = None,
     mode: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """
-    Retrieves the top-k relevant document chunks from the vector database
-    based on the provided question embedding vector.
+    """Retrieve relevant document chunks from the vector database.
 
     Args:
-        question: The input query string.
-        question_vector: A list of floats representing the embedding vector of the query.
-        topk: top-k to retrieve.
-        source_doc: A string for filtering by doc Name (ex: "PEPSICO_2022_10K")
+        question: Query text to search for.
+        question_vector: Precomputed embedding for the question, if available.
+        topk: Number of chunks to return; defaults to config.
+        source_doc: Optional document name filter.
+        mode: Retrieval mode (``vector``, ``keyword``, ``hybrid``); defaults to config.
 
     Returns:
-        A list of dictionaries, where each dictionary contains the metadata
-        and text of a retrieved document chunk.
+        List of chunk dictionaries containing text and metadata.
     """
     cfg = load_config()
     qsec = get_section(cfg, "qa")

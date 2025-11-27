@@ -11,11 +11,13 @@ logger = get_logger(__name__)
 
 
 def list_available_documents(max_docs: int = 1000) -> List[Tuple[str, int]]:
-    """
+    """List indexed documents and their chunk counts from the vector DB.
+
+    Args:
+        max_docs: Maximum number of grouped results to fetch.
+
     Returns:
-        List of tuples [(doc_name, chunk_count), ...] pulled directly from the
-        vector database. Only documents that are already indexed (present in the
-        collection) are returned.
+        List of tuples ``(doc_name, chunk_count)``.
     """
     cfg = load_config()
     vsec = get_section(cfg, "vectordb")

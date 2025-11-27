@@ -19,14 +19,13 @@ logger = get_logger(__name__)
 
 
 def init_client(skip_init_checks: Optional[bool] = None) -> weaviate.WeaviateClient:
-    """Initialize a Weaviate client using config (section: `vectordb`).
+    """Initialize a Weaviate client using config (section: ``vectordb``).
 
     Args:
-        skip_init_checks (Optional[bool]): If provided, overrides config value to skip
-            initial readiness checks.
+        skip_init_checks: Override config to skip readiness checks.
 
     Returns:
-        weaviate.WeaviateClient: Connected client instance.
+        Connected Weaviate client instance.
 
     Raises:
         RuntimeError: If client is not ready and checks are enabled.
@@ -119,7 +118,7 @@ def count_objects(client: weaviate.WeaviateClient, collection_name: str) -> int:
         collection_name: Target collection.
 
     Returns:
-        int: Total count (aggregate).
+        Aggregate object count.
     """
     col = client.collections.get(collection_name)
     agg = col.aggregate.over_all(total_count=True)
@@ -134,9 +133,7 @@ def ensure_collection(client: weaviate.WeaviateClient, name: str) -> None:
         name: Collection name.
 
     Notes:
-        - Vectorizer is set to `none`; vectors must be provided on insert.
-        - Properties align with the upload payload from embed.py/chunks.py.
-        - `chunk_id` is TEXT to allow flexible identifiers.
+        Vectorizer is set to ``none``; vectors must be provided on insert.
     """
     logger.info(f"[INFO] Creating collection '{name}' ...")
     
@@ -177,7 +174,7 @@ def ensure_collection(client: weaviate.WeaviateClient, name: str) -> None:
  
 def reset_collection(client: weaviate.WeaviateClient, name: str) -> None:
     """Drop and re-create the collection using ensure_collection.
-    
+
     Args:
         client: Connected Weaviate client.
         name: Collection name.
@@ -203,9 +200,10 @@ def upload_objects(
     Args:
         client: Weaviate client.
         collection_name: Target collection name.
-        objects: Chunk rows; may include 'embedding' (List[float]).
-        batch_size: Fixed batch size.
+        objects: Chunk rows; may include ``embedding``.
+        batch_size: Batch size for uploads.
         concurrent_requests: Number of parallel insert workers.
+        upsert: Whether to upsert using deterministic UUIDs.
     """
     logger.info(f"[INFO] Upserting objects to '{collection_name}' ...")
     
@@ -222,6 +220,7 @@ def upload_objects(
     failed = 0
 
     def _props_from_obj(obj: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalize object fields into Weaviate property payload."""
         return {
             "source_doc":   obj.get("source_doc", "unknown"),
             "doc_id":       str(obj.get("doc_id", "")),

@@ -23,6 +23,17 @@ def rerank_hits(
     topk: Optional[int] = None,
     question: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
+    """Rerank retrieved hits by cosine similarity to the question embedding.
+
+    Args:
+        question_vector: Embedding vector for the question.
+        hits: Retrieved chunk records containing text and metadata.
+        topk: Maximum number of reranked hits to return; defaults to length of hits.
+        question: Original question text (unused but kept for interface parity).
+
+    Returns:
+        Reranked hits sorted by similarity, truncated to ``topk``.
+    """
     if not hits or not question_vector:
         return hits
 

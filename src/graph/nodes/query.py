@@ -17,13 +17,13 @@ logger = get_logger(__name__)
 
 @lru_cache(maxsize=1)
 def _get_model(model_name: str) -> SentenceTransformer:
-    """Loads and caches the SentenceTransformer model.
-    
+    """Load and cache the SentenceTransformer model.
+
     Args:
-        model_name: The name of the embedding model.
-        
+        model_name: Name of the embedding model.
+
     Returns:
-        An instance of SentenceTransformer.
+        Loaded SentenceTransformer instance.
     """
     
     # Load configuration
@@ -36,13 +36,13 @@ def _get_model(model_name: str) -> SentenceTransformer:
         raise
 
 def query_embeddings(question: str) -> List[float]:
-    """Generates an embedding for a given query string.
+    """Generate an embedding for a query string.
 
     Args:
-        question: The input string (question) to embed.
+        question: Input question text.
 
     Returns:
-        A list of floats representing the normalized embedding vector for the query.
+        Normalized embedding vector as a list of floats.
     """
     
     # 1) Config

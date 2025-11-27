@@ -17,14 +17,13 @@ logger = get_logger(__name__)
 
 
 def generate_embeddings(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """
-    Generate dense embeddings for document chunks.
+    """Generate dense embeddings for document chunks.
 
     Args:
-        chunks (List[Dict[str, Any]]): List of chunk dictionaries.
+        chunks: List of chunk dictionaries containing text.
 
     Returns:
-        List[Dict[str, Any]]: Same chunks, each with an 'embedding' key added.
+        Same list where each chunk has an added ``embedding`` vector.
     """
     
     # 1) load configuration

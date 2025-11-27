@@ -18,9 +18,7 @@ logger = get_logger(__name__)
 TARGET_DOCS = ["PEPSICO_2022_10K"]  # 특정 문서 스템(파일명에서 .pdf 뺀 것). None이면 전체
 
 def main():
-    """
-    Runs a QA test against all documents found in the data/pdfs folder.
-    """
+    """Run LangGraph QA over filtered FinanceBench questions."""
     # 1. Load configuration and paths
     cfg = load_config()
     paths = cfg.get("paths", {})

@@ -15,6 +15,15 @@ logger = get_logger(__name__)
 
 _CITE_RE = re.compile(r"\[(\d+)\]")
 def _extract_idx_from_text(text: str, max_idx: int) -> List[int]:
+    """Extract numeric citation markers from model text.
+
+    Args:
+        text: Generated answer text potentially containing ``[n]`` markers.
+        max_idx: Maximum valid citation index.
+
+    Returns:
+        List of unique citation indexes in ascending encounter order.
+    """
     seen, out = set(), []
     for m in _CITE_RE.finditer(text or ""):
         try:
@@ -27,7 +36,15 @@ def _extract_idx_from_text(text: str, max_idx: int) -> List[int]:
 
 
 def _pack_citations(hits: List[Dict[str, Any]], idxs: List[int]) -> List[Dict[str, Any]]:
-    """LLM response index → actual meta data mapping to dict"""
+    """Map LLM citation indexes back to hit metadata.
+
+    Args:
+        hits: Retrieved chunk records.
+        idxs: Citation indexes produced by the model.
+
+    Returns:
+        List of citation dicts enriched with source metadata.
+    """
     out = []
     for i in idxs:
         if 1 <= i <= len(hits):
@@ -46,17 +63,12 @@ def _pack_citations(hits: List[Dict[str, Any]], idxs: List[int]) -> List[Dict[st
 def _build_messages(question: str, topk: List[Dict[str, Any]]) -> List[Dict[str, str]]:
     """Builds the list of messages for the language model prompt.
 
-    This function constructs the system and user messages based on a predefined
-    prompt template. It injects the user's question and the retrieved
-    document chunks (top-k) into the user prompt.
-
     Args:
-        question: The user's question.
-        topk: A list of retrieved document chunks to be used as context.
+        question: User question text.
+        topk: Retrieved chunks to use as context.
 
     Returns:
-        A list of message dictionaries formatted for the chat model,
-        typically containing a system message and a user message.
+        Message list containing system and user roles for the LLM.
     """
     prompt = load_prompt("qa_prompt")
     system = prompt["system"]

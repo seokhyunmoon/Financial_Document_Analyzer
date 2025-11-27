@@ -22,6 +22,7 @@ logger = get_logger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for FinanceBench evaluation."""
     parser = argparse.ArgumentParser(description="FinanceBench batch evaluation")
     parser.add_argument(
         "--docs",
@@ -42,6 +43,15 @@ def parse_args() -> argparse.Namespace:
 
 
 def iter_questions(dataset_path: Path, allowed_docs: Optional[Iterable[str]]):
+    """Yield question rows from the dataset, optionally filtered by doc set.
+
+    Args:
+        dataset_path: Path to the FinanceBench JSONL file.
+        allowed_docs: Iterable of doc_name strings to include; include all if None/empty.
+
+    Yields:
+        Dict rows from the dataset.
+    """
     allowed = None
     if allowed_docs:
         allowed = {name.strip() for name in allowed_docs if name.strip()}
@@ -57,6 +67,7 @@ def iter_questions(dataset_path: Path, allowed_docs: Optional[Iterable[str]]):
             count += 1
 
 def main() -> None:
+    """Execute batch QA + evaluation against FinanceBench."""
     args = parse_args()
     cfg = load_config()
     paths = cfg.get("paths", {})

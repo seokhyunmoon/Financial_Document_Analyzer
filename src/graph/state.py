@@ -19,10 +19,26 @@ class QAState(TypedDict, total=False):
     source_doc: Optional[str]
 
 def node_encode(state: QAState) -> QAState:
+    """Embed the incoming question and attach the vector to state.
+
+    Args:
+        state: Mutable LangGraph state containing the user question.
+
+    Returns:
+        The updated state with ``question_vector`` populated.
+    """
     state["question_vector"] = query_embeddings(state["question"])
     return state
 
 def node_retrieve(state: QAState) -> QAState:
+    """Retrieve candidate chunks for the encoded question.
+
+    Args:
+        state: LangGraph state containing the question vector and optional filters.
+
+    Returns:
+        The updated state with ``hits`` set to retrieved chunks.
+    """
     state["hits"] = retrieve_topk(
         state["question"], 
         state["question_vector"],
@@ -32,10 +48,26 @@ def node_retrieve(state: QAState) -> QAState:
     return state
 
 def node_generate(state: QAState) -> QAState:
+    """Generate an answer from retrieved chunks.
+
+    Args:
+        state: LangGraph state containing question text and retrieved hits.
+
+    Returns:
+        The updated state with the ``answer`` payload.
+    """
     state["answer"] = generator(state["question"], state["hits"])
     return state
 
 def node_rerank(state: QAState) -> QAState:
+    """Optionally rerank retrieved hits using the same embedder.
+
+    Args:
+        state: LangGraph state containing the question embedding and hits.
+
+    Returns:
+        The updated state with reranked ``hits``.
+    """
     state["hits"] = rerank_hits(
         state.get("question_vector"),
         state.get("hits", []),
@@ -45,6 +77,11 @@ def node_rerank(state: QAState) -> QAState:
 
 
 def build_graph() -> StateGraph:
+    """Build the LangGraph QA pipeline based on configuration.
+
+    Returns:
+        A compiled LangGraph graph ready for invocation.
+    """
     cfg = load_config()
     qsec = get_section(cfg, "qa")
     rerank_cfg = get_section(qsec, "rerank")
