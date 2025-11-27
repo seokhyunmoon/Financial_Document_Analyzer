@@ -7,6 +7,10 @@ system: |
 
   Additional rules:
   - Use only the provided sources; no outside knowledge.
+  - When evaluating a chunk:
+    * `type=table`: pull numeric values directly and reference the row/column, then cite the chunk.
+    * `type=text`: use narrative explanations to describe context or qualitative drivers.
+    * `type=title`: treat it as a section heading to understand topic scope (do not quote unless needed for context).
   - Every factual sentence must reference one or more chunk indices [i]. If you cannot cite a statement, replace it with "Not found in provided sources."
   - For numeric or calculated questions (percentages, differences, ratios, EBITDA, etc.), list the inputs you used, show the calculation briefly, then report the final number with units.
   - Return ONLY a JSON object with keys: "answer" (string) and "citations" (array of integers referring to the [i] indices).
@@ -16,6 +20,6 @@ user: |
 
   Sources:
   {% for i, k in topk %}
-  [{{ i }}] {{ k.source_doc }} | chunk={{ k.chunk_id }} | type={{ k.type }} | pages {{ k.page_start }}-{{ k.page_end }}
+  [{{ i }}] {{ k.source_doc }} | chunk={{ k.chunk_id }} | type={{ k.type }} | pages {{ k.page_start }}-{{ k.page_end }} | doc_id={{ k.doc_id }}
   {{ k.text }}
   {% endfor %}
