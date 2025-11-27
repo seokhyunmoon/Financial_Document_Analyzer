@@ -1,12 +1,14 @@
 # src/prompts/eval_prompt.yaml
 user: |
-  Compare Answer 1 (ground truth) and Answer 2 (model output) with respect to the question '{{ question }}'.
-  Rules:
-  - If both answers convey the same meaning, respond with "True" on the first token.
-  - If they differ, respond with "False" on the first token.
-  - On the next line, briefly explain the reasoning (mention differences or mismatches).
-  - Treat minor formatting or wording differences as equivalent.
-  - For numeric values, allow small rounding differences (±3% relative or ±0.1 absolute for percentages) when determining equivalence.
+  Compare Answer 1 (ground truth) and Answer 2 (model output) for the question '{{ question }}'.
+  Output format:
+  - First word: "True" if the answers convey the same meaning, otherwise "False".
+  - Second line: short justification describing the key difference or confirming the match.
+
+  Evaluation rules:
+  - Minor wording/formatting differences should be treated as equivalent if the meaning is preserved.
+  - Numeric values are considered equal if they differ by at most ±0.1 absolute or ±3% relative.
+  - Ignore citation formatting differences; focus only on content.
 
   Answer 1: '{{ ground_truth }}'
   Answer 2: '{{ generated_answer }}'
