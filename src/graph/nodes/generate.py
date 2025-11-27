@@ -6,7 +6,7 @@ This module defines nodes for generating natural language answers based on a use
 """
 from typing import List, Dict, Any
 import re
-from adapters.ollama import _generate_ollama
+from adapters.ollama import ollama_chat_structured, QAResponse
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 from utils.prompts import load_prompt, render_prompt
@@ -111,7 +111,7 @@ def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
     
     # generate answer
     if provider == "ollama":
-        response = _generate_ollama(model, message, think=think)
+        response = ollama_chat_structured(model, message, QAResponse, think=think)
     else:
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     

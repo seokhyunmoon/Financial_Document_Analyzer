@@ -3,59 +3,30 @@ from typing import List, Dict, Any, Type, Optional
 from ollama import Client
 from pydantic import BaseModel
 
-# Ollama response format
+
 class QAResponse(BaseModel):
+    """Default schema used by the QA generator."""
     answer: str
     citations: list[int] | None = None
 
-def _generate_ollama(
-    model_name: str,
-    messages: List[Dict[str, str]],
-    think: Optional[Any] = None,
-) -> Dict[str, Any]:
-    
-    """Generates a response using an Ollama chat model.
 
-    Args:
-        model_name: The name of the Ollama model to use for generation.
-        messages: The list of messages (prompt) to send to the model.
-        gsec: The 'generate' section of the configuration dictionary (currently unused).
-
-    Returns:
-        The generated answer as a string.
-    """
-    client = Client()
-    try:
-        # options = {
-        #     "temperature": gsec.get("temperature", 0.1),
-        #     "num_ctx": gsec.get("num_ctx", 512),
-        #     "top_k": gsec.get("top_k", 10),
-        #     "top_p": gsec.get("top_p", 0.8),
-        # }
-        chat_kwargs: Dict[str, Any] = {
-            "model": model_name,
-            "messages": messages,
-            "format": QAResponse.model_json_schema(),
-            "options": {},
-        }
-        if think is not None:
-            chat_kwargs["think"] = think
-
-        response = client.chat(**chat_kwargs)
-        return QAResponse.model_validate_json(response.message.content).model_dump()
-    
-    finally:
-        # Manually close the underlying httpx client to prevent ResourceWarning
-        if hasattr(client, '_client') and client._client:
-            client._client.close()
-            
-            
 def ollama_chat_structured(
     model_name: str,
     messages: List[Dict[str, str]],
     schema_model: Type[BaseModel],
     think: Optional[Any] = None,
 ) -> Dict[str, Any]:
+    """Call the Ollama chat endpoint and validate the response.
+
+    Args:
+        model_name: Name of the Ollama model to use.
+        messages: Chat message dicts passed to the model.
+        schema_model: Pydantic schema used to validate the JSON response.
+        think: Optional thinking-mode setting (bool for most models or str such as 'low').
+
+    Returns:
+        Parsed response as ``schema_model.model_dump()``.
+    """
     
     client = Client()
     try:
@@ -63,10 +34,10 @@ def ollama_chat_structured(
             "model": model_name,
             "messages": messages,
             "format": schema_model.model_json_schema(),
+            "options": {},
         }
         if think is not None:
             chat_kwargs["think"] = think
-
         resp = client.chat(**chat_kwargs)
         return schema_model.model_validate_json(resp["message"]["content"]).model_dump()
     finally:
