@@ -1,5 +1,5 @@
 # src/graph/models/ollama.py
-from typing import List, Dict, Any, Type
+from typing import List, Dict, Any, Type, Optional
 from ollama import Client
 from pydantic import BaseModel
 
@@ -8,7 +8,11 @@ class QAResponse(BaseModel):
     answer: str
     citations: list[int] | None = None
 
-def _generate_ollama(model_name: str, messages: List[Dict[str,str]]) -> Dict[str, Any]:
+def _generate_ollama(
+    model_name: str,
+    messages: List[Dict[str, str]],
+    think: Optional[Any] = None,
+) -> Dict[str, Any]:
     
     """Generates a response using an Ollama chat model.
 
@@ -28,12 +32,16 @@ def _generate_ollama(model_name: str, messages: List[Dict[str,str]]) -> Dict[str
         #     "top_k": gsec.get("top_k", 10),
         #     "top_p": gsec.get("top_p", 0.8),
         # }
-        response = client.chat(
-            model=model_name, 
-            messages=messages, 
-            format=QAResponse.model_json_schema(),
-            options={}
-        )
+        chat_kwargs: Dict[str, Any] = {
+            "model": model_name,
+            "messages": messages,
+            "format": QAResponse.model_json_schema(),
+            "options": {},
+        }
+        if think is not None:
+            chat_kwargs["think"] = think
+
+        response = client.chat(**chat_kwargs)
         return QAResponse.model_validate_json(response.message.content).model_dump()
     
     finally:
@@ -42,15 +50,24 @@ def _generate_ollama(model_name: str, messages: List[Dict[str,str]]) -> Dict[str
             client._client.close()
             
             
-def ollama_chat_structured(model_name: str, messages: List[Dict[str, str]], schema_model: Type[BaseModel]) -> Dict[str, Any]:
+def ollama_chat_structured(
+    model_name: str,
+    messages: List[Dict[str, str]],
+    schema_model: Type[BaseModel],
+    think: Optional[Any] = None,
+) -> Dict[str, Any]:
     
     client = Client()
     try:
-        resp = client.chat(
-            model=model_name,
-            messages=messages,
-            format=schema_model.model_json_schema(),
-        )
+        chat_kwargs: Dict[str, Any] = {
+            "model": model_name,
+            "messages": messages,
+            "format": schema_model.model_json_schema(),
+        }
+        if think is not None:
+            chat_kwargs["think"] = think
+
+        resp = client.chat(**chat_kwargs)
         return schema_model.model_validate_json(resp["message"]["content"]).model_dump()
     finally:
         if hasattr(client, "_client") and client._client:

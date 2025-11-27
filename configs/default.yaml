@@ -71,7 +71,11 @@ qa:
 generate:
   provider: ollama
   model_name: qwen3:8b
+  think: true
 
+
+# /src/services/evaluate.py
 evaluate:
   provider: ollama
   model_name: gpt-oss:20b
+  think: medium

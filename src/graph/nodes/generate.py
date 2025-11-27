@@ -104,13 +104,14 @@ def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
     gsec = get_section(cfg, "generate")
     provider = gsec.get("provider", "ollama")
     model = gsec.get("model_name", "qwen3:8b")
+    think = gsec.get("think", None)
     
     # build messages
     message = _build_messages(question, hits)
     
     # generate answer
     if provider == "ollama":
-        response = _generate_ollama(model, message)
+        response = _generate_ollama(model, message, think=think)
     else:
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     

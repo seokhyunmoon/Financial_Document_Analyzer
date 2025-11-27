@@ -19,6 +19,7 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
     esec = get_section(cfg, "evaluate")
     provider = esec.get("provider", "ollama")
     model = esec.get("model_name", "gpt-oss:20b")
+    think = esec.get("think", None)
     
     # load prompt and build message
     prompt = load_prompt("eval_prompt")
@@ -32,7 +33,7 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
     
     # generate answer
     if provider == "ollama":
-        response = ollama_chat_structured(model, message, EvalResponse)
+        response = ollama_chat_structured(model, message, EvalResponse, think=think)
     else:
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     
