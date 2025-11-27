@@ -7,13 +7,14 @@ paths:
   embed_dir: data/processed/embeddings
   
 
-# src/ingestion/elements.py
+# /src/graph/nodes/elements.py
 partitioning:
   strategy: hi_res
   hi_res_model: yolox
   languages:
     - eng
   infer_table_structure: true
+
 
 cleaning:
   apply_unicode_quotes: true
@@ -26,19 +27,19 @@ cleaning:
     lowercase: false
 
 
-# src/ingestion/chunking.py
+# /src/graph/nodes/chunks.py
 chunking:
   min_chars: 2048
 
 
-# src/ingestion/embeddings.py
+# /src/graph/nodes/embed.py
 embedding:
   model_name: Qwen/Qwen3-Embedding-4B
   batch_size: 8
   normalize_embeddings: true
 
 
-# src/ingestion/vectorstore.py
+# /src/graph/nodes/vectordb.py
 vectordb:
   use_docker: false
   init:
@@ -60,21 +61,15 @@ vectordb:
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
-  retriever_mode: vector #vector, keyword, hybrid
+  retriever_mode: hybrid #vector, keyword, hybrid
   hybrid_alpha: 0.5
   rerank:
-    enabled: false
+    enabled: true
     topk: 10
 
 
 # /src/graph/nodes/generate.py
 generate:
   provider: ollama
-  
-  model_name: qwen3:8b
-
-
-
-evaluate:
-  provider: ollama
-  model_name: gpt-oss:20b
+  model_name: llama3.1:8b
+  # model_name: qwen3:8b

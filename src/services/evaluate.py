@@ -16,9 +16,9 @@ class EvalResponse(BaseModel):
 def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict:
     # load config
     cfg = load_config()
-    gsec = get_section(cfg, "generate")
-    provider = gsec.get("provider", "ollama")
-    model = gsec.get("model_name", "qwen3:8b")
+    esec = get_section(cfg, "evaluate")
+    provider = esec.get("provider", "ollama")
+    model = esec.get("model_name", "gpt-oss:20b")
     
     # load prompt and build message
     prompt = load_prompt("eval_prompt")
