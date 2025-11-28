@@ -24,6 +24,7 @@ def list_available_documents(max_docs: int = 1000) -> List[Tuple[str, int]]:
     collection_name = vsec.get("collection_name", "FinancialDocChunk")
 
     client = None
+    logger.info(f"[INFO] Listing indexed documents (limit={max_docs})")
     try:
         client = init_client()
         collection = client.collections.get(collection_name)
@@ -41,9 +42,10 @@ def list_available_documents(max_docs: int = 1000) -> List[Tuple[str, int]]:
             docs.append((str(doc_name), chunk_count))
 
         docs.sort(key=lambda item: item[0])
+        logger.info(f"[OK] Retrieved {len(docs)} indexed document(s)")
         return docs
     except Exception as exc:
-        logger.warning(f"[inventory] Failed to list indexed documents: {exc}")
+        logger.error(f"[ERROR] Failed to list indexed documents: {exc}")
         return []
     finally:
         close_client(client)

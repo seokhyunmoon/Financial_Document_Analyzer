@@ -49,19 +49,22 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
     message.append({"role": "user", "content": user_prompt})
 
     try:
+        logger.info(f"[INFO] Running evaluator provider={provider} model={model}")
         # The `ollama_chat_structured` helper attempts to parse the LLM's JSON
         # output into the `EvalResponse` Pydantic model.
         response_data = ollama_chat_structured(model, message, EvalResponse, think=think)
         
         if response_data:
+            logger.info(f"[OK] Evaluation completed classification={response_data.get('classification')}")
             return {
                 "classification": response_data.get("classification", "INCORRECT"),
                 "reasoning": response_data.get("reasoning", "Failed to get reasoning from evaluator.")
             }
 
     except Exception as e:
-        logger.error(f"Failed to evaluate response due to an error: {e}")
+        logger.error(f"[ERROR] Failed to evaluate response: {e}")
 
+    logger.warning("[WARN] Falling back to default INCORRECT classification")
     # Fallback response in case of parsing failure or other errors
     return {
         "classification": "INCORRECT",

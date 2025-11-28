@@ -84,7 +84,7 @@ def init_client(skip_init_checks: Optional[bool] = None) -> weaviate.WeaviateCli
                 environment_variables=embedded_env or None,
             )
     except Exception as e:
-        logger.warning(f"[ERROR] Failed to initialize Weaviate client: {e}")
+        logger.error(f"[ERROR] Failed to initialize Weaviate client: {e}")
         raise
 
     # Optionally verify readiness (works for both embedded & local)

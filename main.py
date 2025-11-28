@@ -10,6 +10,9 @@ sys.path.append(str(Path(__file__).resolve().parents[0] / "src"))
 from graph.state import compiled_graph, QAState
 from utils.inventory import list_available_documents
 from services.ingest import ingest_files
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 st.set_page_config(page_title="Financial Document Analyzer", page_icon="💵", layout="wide")
 
@@ -57,7 +60,17 @@ if prompt := st.chat_input("Send a message..."):
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
             inputs = QAState(question=prompt.strip(), topk=10, source_doc=source_doc_filter)
-            result = compiled_graph.invoke(inputs)
+            logger.info(
+                "[INFO] Invoking QA graph",
+                extra={"question_len": len(prompt.strip()), "source_filter": source_doc_filter or "ALL"},
+            )
+            try:
+                result = compiled_graph.invoke(inputs)
+                logger.info("[OK] Graph invocation completed")
+            except Exception as exc:
+                logger.error(f"[ERROR] Graph invocation failed: {exc}")
+                st.error("Sorry, something went wrong while generating the answer.")
+                st.stop()
             
             answer_dict = result.get("answer", {}) or {}
             answer_text = answer_dict.get("answer", "No answer found.")
@@ -79,6 +92,10 @@ if prompt := st.chat_input("Send a message..."):
             #         st.json(details)
             
             sources = answer_dict.get("citations", []) or []
+            logger.info(
+                "[OK] Response ready",
+                extra={"answer_len": len(answer_text), "citations": len(sources)},
+            )
             # (선택) 상단에 인덱스만 간단히 표기
             idxs = [c.get("i") for c in sources if isinstance(c, dict) and "i" in c]
             if idxs:
@@ -109,10 +126,13 @@ with col1:
     if st.button("Upload", type="primary", disabled=(not files), use_container_width=True):
         with st.status("Ingest running...", expanded=True) as status:
             try:
+                logger.info(f"[INFO] Starting upload for {len(files)} file(s)")
                 ingest_files(files, reset=False)
+                logger.info("[OK] Upload successful")
                 st.success("Uploaded")
                 st.rerun() # Rerun to update the list of indexed documents
             except Exception as e:
+                logger.error(f"[ERROR] Upload failed: {e}")
                 st.error(f"Upload failed: {e}")
 
 with col2:
@@ -124,11 +144,14 @@ with col2:
             if st.button("Yes", type="primary", use_container_width=True):
                 with st.status("Resetting database...", expanded=True):
                     try:
+                        logger.info("[INFO] Reset requested via UI")
                         ingest_files([], reset=True)
+                        logger.info("[OK] Reset completed")
                         st.success("Database reset successfully.")
                         st.session_state.confirm_reset = False
                         st.rerun()
                     except Exception as e:
+                        logger.error(f"[ERROR] Database reset failed: {e}")
                         st.error(f"Database reset failed: {e}")
         with c2:
             if st.button("Cancel", type="secondary", use_container_width=True):

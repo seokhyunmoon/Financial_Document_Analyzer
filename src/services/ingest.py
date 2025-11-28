@@ -75,6 +75,7 @@ def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, An
     """
     t0 = time.time()
     doc_id = _safe_stem(pdf_path.name)
+    logger.info(f"[INFO] Starting ingest for {doc_id}")
 
     # 1) elements
     elements = extract_elements(str(pdf_path), doc_id)
@@ -91,7 +92,7 @@ def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, An
     m_out = out_dirs["embeddings_dir"] / f"{doc_id}.jsonl"
     write_jsonl(str(m_out), embedded)
 
-    return {
+    summary = {
         "doc_id": doc_id,
         "n_elements": len(elements),
         "n_chunks": len(chunks),
@@ -100,6 +101,11 @@ def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, An
         "rows": embedded,
         "paths": {"elements": e_out, "chunks": c_out, "embeddings": m_out},
     }
+    logger.info(
+        f"[OK] Finished ingest for {doc_id}",
+        extra={"elements": len(elements), "chunks": len(chunks), "vectors": len(embedded)},
+    )
+    return summary
 
 def ingest_files(
     uploaded_files: Iterable[Union[Path, UploadedFile]],
@@ -133,21 +139,28 @@ def ingest_files(
     
     client = init_client()
     
+    uploads = list(uploaded_files)
+    logger.info(f"[INFO] Ingest request received reset={reset} file_count={len(uploads)}")
+    
     try:
         if reset:
             try:
+                logger.info(f"[INFO] Resetting collection '{collection}'")
                 reset_collection(client, collection)
+                logger.info(f"[OK] Collection '{collection}' reset complete")
             except TypeError:
                 if client.collections.exists(collection):
+                    logger.warning(f"[WARN] Reset compatibility issue, performing manual delete for '{collection}'")
                     client.collections.delete(collection)
         ensure_collection(client, collection)
 
         results: List[Dict[str, Any]] = []
-        for up in uploaded_files:
+        for up in uploads:
             dest = _save_uploaded_to_local(up, raw_dir)
-            logger.info(f"[INGEST] {dest.name}")
+            logger.info(f"[INFO] Saved upload '{dest.name}' to raw directory")
             info = ingest_single_pdf(dest, out_dirs)
             upload_objects(client, collection, info["rows"])
+            logger.info(f"[OK] Uploaded {info['n_vectors']} vectors for {info['doc_id']}")
             results.append(info)
         return results
     
