@@ -90,25 +90,32 @@ def main() -> None:
     app = build_graph()
 
     processed = 0
-    correct = 0
     errors = 0
 
     with out_path.open("w", encoding="utf-8") as out_f:
         for row in iter_questions(dataset_path, docs):
-            question = str(row.get("question", "")).strip()
-            ground_truth = str(row.get("answer", "")).strip()
             doc_name = str(row.get("doc_name", "")).strip()
             question_type = row.get("question_type")
-            question_reasoning = row.get("question_reasoning")
-
+            question = str(row.get("question", "")).strip()
+            ground_truth = str(row.get("answer", "")).strip()
+            evidences = row.get("evidence") or []
+            evidence_items = [
+                {
+                    "evidence_text": ev.get("evidence_text"),
+                    "evidence_page_num": ev.get("evidence_page_num"),
+                }
+                for ev in evidences
+                if isinstance(ev, dict)
+            ]
+            
             processed += 1
             logger.info("[%s] Q%d: %s", doc_name, processed, question[:120])
             record: Dict[str, Any] = {
                 "doc_name": doc_name,
+                "question_type": question_type,
                 "question": question,
                 "ground_truth": ground_truth,
-                "question_type": question_type,
-                "question_reasoning": question_reasoning,
+                "evidence": evidence_items,
             }
             try:
                 result = app.invoke(
@@ -129,8 +136,6 @@ def main() -> None:
                     generated_answer=model_answer,
                 )
                 classification = eval_result.get("classification")
-                is_correct = classification == "CORRECT"
-                correct += 1 if is_correct else 0
 
                 record.update(
                     {
@@ -138,7 +143,6 @@ def main() -> None:
                         "citations": citations,
                         "hits": hits,
                         "eval_classification": classification,
-                        "eval_reasoning": eval_result.get("reasoning"),
                     }
                 )
             except Exception as exc:
@@ -157,9 +161,8 @@ def main() -> None:
             out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     logger.info(
-        "Finished. processed=%d correct=%d errors=%d output=%s",
+        "Finished. processed=%d errors=%d output=%s",
         processed,
-        correct,
         errors,
         out_path,
     )
