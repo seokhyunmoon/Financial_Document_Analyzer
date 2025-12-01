@@ -19,11 +19,9 @@ cleaning:
   apply_unicode_quotes: true
   apply_clean: true
   clean_options:
-    bullets: true
+    bullets: false
     extra_whitespace: true
-    dashes: true
-    trailing_punctuation: false
-    lowercase: false
+    dashes: false
 
 
 # src/ingestion/chunking.py

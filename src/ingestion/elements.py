@@ -79,8 +79,6 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
                 bullets=clean_opts.get("bullets", True),
                 extra_whitespace=clean_opts.get("extra_whitespace", True),
                 dashes=clean_opts.get("dashes", True),
-                trailing_punctuation=clean_opts.get("trailing_punctuation", False),
-                lowercase=clean_opts.get("lowercase", False),
             )
         if not text_clean.strip():
             continue
