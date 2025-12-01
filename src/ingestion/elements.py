@@ -32,23 +32,6 @@ def _norm_text(s: str) -> str:
         return s
     return _WS_RE.sub(" ", s)
 
-def _map_unstructured_category(category: Optional[str]) -> str:
-    """Map Unstructured element categories to simplified types.
-
-    Args:
-        category: Unstructured category (e.g., ``Title``, ``Table``).
-
-    Returns:
-        One of ``title``, ``table``, or ``text``.
-    """
-    if not category:
-        return "text"
-    c = category.lower()
-    if c == "title":
-        return "title"
-    if c == "table":
-        return "table"
-    return "text"
 
 def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
     """Extract and normalize structural elements from a PDF.
@@ -75,11 +58,12 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
 
     out: List[Dict[str, Any]] = []
 
-    for el in elements:
-        t_raw = getattr(el, "category", None)
-        t = _map_unstructured_category(t_raw)
+    for element in elements:
+        # element type
+        type = getattr(element, "category", None)
 
-        text_raw = getattr(el, "text", "") or ""
+        # text
+        text_raw = getattr(element, "text", "") or ""
         text_norm = _norm_text(text_raw)
         if not text_norm:
             continue
@@ -101,16 +85,23 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
         if not text_clean.strip():
             continue
 
-        meta = getattr(el, "metadata", None)
+        #metadata
+        meta = getattr(element, "metadata", None)
+        element_id = meta.element_id if (meta and hasattr(meta, "element_id")) else None
         page = meta.page_number if (meta and hasattr(meta, "page_number")) else None
+        table_as_html = meta.text_as_html if (meta and hasattr(meta, "text_as_html")) else None
+        
 
         out.append(
             {
                 "source_doc": doc_id,
-                "doc_id": f"{doc_id}_p{page}" if page is not None else doc_id,
-                "type": t if t in ("title", "table") else "text",
+                "type": type,
                 "text": text_clean,
-                "page": page,
+                "metadata": {
+                    "element_id": element_id,
+                    "page": page,
+                    "table_as_html": table_as_html,
+                },
             }
         )
 
