@@ -16,6 +16,22 @@ from utils.config import load_config, get_section
 logger = get_logger(__name__)
 
 
+def _text_for_embedding(chunk):
+    """Prepare text from a chunk for embedding generation.
+    Args:
+        chunk: A chunk dictionary containing text and optional section title.
+        
+    Returns:
+        A single string combining section title and text.
+    """
+    
+    parts = []
+    if chunk.get("section_title"):
+        parts.append(chunk["section_title"])
+    parts.append(chunk.get("text") or "")
+    return "\n".join(part for part in parts if part)
+
+
 def generate_embeddings(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Generate dense embeddings for document chunks.
 
@@ -46,7 +62,7 @@ def generate_embeddings(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         raise
 
     # 4) generate embeddings
-    texts = [c["text"] for c in chunks]
+    texts = [_text_for_embedding(c) for c in chunks]
     logger.info(f"[INFO] Generating embeddings for {len(texts)} chunks...")
 
     embeddings = model.encode(

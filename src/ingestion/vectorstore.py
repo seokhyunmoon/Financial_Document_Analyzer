@@ -138,13 +138,14 @@ def ensure_collection(client: weaviate.WeaviateClient, name: str) -> None:
     logger.info(f"[INFO] Creating collection '{name}' ...")
     
     props = [
-        Property(name="source_doc",   data_type=DataType.TEXT),
-        Property(name="doc_id",       data_type=DataType.TEXT),
-        Property(name="chunk_id",     data_type=DataType.TEXT),  # keep TEXT for flexibility
-        Property(name="element_type", data_type=DataType.TEXT),
-        Property(name="text",         data_type=DataType.TEXT),
-        Property(name="page_start",   data_type=DataType.INT),
-        Property(name="page_end",     data_type=DataType.INT),
+        Property(name="source_doc",    data_type=DataType.TEXT),
+        Property(name="chunk_id",      data_type=DataType.TEXT),  # keep TEXT for flexibility
+        Property(name="element_type",  data_type=DataType.TEXT),
+        Property(name="section_title", data_type=DataType.TEXT),
+        Property(name="text",          data_type=DataType.TEXT),
+        Property(name="text_as_html",  data_type=DataType.TEXT),
+        Property(name="page_start",    data_type=DataType.INT),
+        Property(name="page_end",      data_type=DataType.INT),
     ]
 
     # v4 SDK supports exists(); keep fallback for older versions
@@ -223,10 +224,11 @@ def upload_objects(
         """Normalize object fields into Weaviate property payload."""
         return {
             "source_doc":   obj.get("source_doc", "unknown"),
-            "doc_id":       str(obj.get("doc_id", "")),
             "chunk_id":     str(obj.get("chunk_id", "")),   
             "element_type": str(obj.get("type", "")),       
+            "section_title": obj.get("section_title"),
             "text":         obj.get("text", ""),
+            "text_as_html": obj.get("text_as_html"),
             "page_start":   obj.get("page_start"),
             "page_end":     obj.get("page_end"),
         }
@@ -239,8 +241,8 @@ def upload_objects(
             # Stable key for UUIDv5
             key = {
                 "source_doc": props["source_doc"],
-                "doc_id":     props["doc_id"],
                 "chunk_id":   props["chunk_id"],
+                "page_start": props["page_start"],
             }
             uuid = generate_uuid5(key)
             try:
@@ -267,8 +269,8 @@ def upload_objects(
             vec = obj.get("embedding") or obj.get("vector")
             key = {
                 "source_doc": props["source_doc"],
-                "doc_id":     props["doc_id"],
                 "chunk_id":   props["chunk_id"],
+                "page_start": props["page_start"],
             }
             uuid = generate_uuid5(key)
             if vec is not None:

@@ -29,6 +29,6 @@ user: |
 
   Sources:
   {% for i, k in topk %}
-  [{{ i }}] {{ k.source_doc }} | chunk={{ k.chunk_id }} | type={{ k.type }} | pages {{ k.page_start }}-{{ k.page_end }} | doc_id={{ k.doc_id }}
+  [{{ i }}] {{ k.source_doc }} | chunk={{ k.chunk_id }} | type={{ k.type }} | section={{ k.section_title }} | pages {{ k.page_start }}-{{ k.page_end }}
   {{ k.text }}
   {% endfor %}

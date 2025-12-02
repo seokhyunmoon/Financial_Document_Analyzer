@@ -73,17 +73,25 @@ def _build_messages(question: str, topk: List[Dict[str, Any]]) -> List[Dict[str,
     prompt = load_prompt("qa_prompt")
     system = prompt["system"]
     
-    _topk = [
-        {
+    _topk = []
+    for k in topk:
+        text = (k.get("text") or "").strip()
+        html = (k.get("text_as_html") or "").strip()
+        if k.get("type") == "table" and html:
+            body = html
+        else:
+            body = text
+        if not body:
+            continue
+        _topk.append({
             "source_doc": k.get("source_doc"),
             "chunk_id": k.get("chunk_id"),
             "element": k.get("type"),
-            "text": (k.get("text") or "").strip(),
+            "section_title": k.get("section_title"),
+            "text": body,
             "page_start": k.get("page_start"),
             "page_end": k.get("page_end"),   
-        }
-        for k in topk if (k.get("text") or "").strip()
-    ]
+        })
     
     user = render_prompt(prompt["user"], question=question, topk=list(enumerate(_topk, start=1)))
     return [{"role": "system", "content": system},

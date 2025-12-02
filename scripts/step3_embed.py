@@ -1,27 +1,59 @@
-import json, sys
+#!/usr/bin/env python
+"""
+Generate embeddings for a single chunk file.
+
+Example:
+    python scripts/step3_embed.py --chunks data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl
+"""
+
+import argparse
+import json
+import sys
 from pathlib import Path
-import jsonlines
-# Adjust path so we can import from src
+
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from ingestion.embeddings import generate_embeddings
 from utils.files import write_jsonl
 
-pdf = Path("data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl")  # For testing a single file
-# pdf = Path("data/processed/chunks/BESTBUY_2024Q2_10Q_chunks.jsonl")  # For testing a single file
-# pdf = Path("data/processed/chunks/JOHNSON_JOHNSON_2023_8K_dated-2023-08-30_chunks.jsonl")  # For testing a single file
-# pdf = Path("data/processed/chunks/PEPSICO_2022_10K_chunks.jsonl")  # For testing a single file
-# pdf = Path("data/processed/chunks/ULTABEAUTY_2023Q4_EARNINGS_chunks.jsonl")  # For testing a single file
 
-with open(pdf) as f:
-    chunks = [json.loads(line) for line in f]
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Embed chunk JSONL file")
+    parser.add_argument(
+        "--chunks",
+        type=Path,
+        required=True,
+        help="Path to <doc>_chunks.jsonl produced by step2.",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=None,
+        help="Optional output path; defaults to <embeddings_dir>/<doc>.jsonl",
+    )
+    return parser.parse_args()
 
-embedded = generate_embeddings(chunks)
-output_path = Path("data/processed/embeddings")
 
-c_out = output_path / f"AMERICANEXPRESS_2022_10K.jsonl"
-write_jsonl(str(c_out), embedded)
+def main() -> None:
+    args = parse_args()
+    chunks_path = args.chunks.resolve()
+    if not chunks_path.exists():
+        raise FileNotFoundError(f"Chunks file not found: {chunks_path}")
 
-        
-print(embedded[0].keys())        # expect: includes 'embedding'
-print(len(embedded[0]["embedding"])) 
+    with chunks_path.open("r", encoding="utf-8") as fh:
+        chunks = [json.loads(line) for line in fh]
+
+    embedded = generate_embeddings(chunks)
+
+    default_out = (
+        Path("data/processed/embeddings") / chunks_path.name.replace("_chunks", "")
+    )
+    out_path = (args.output or default_out).resolve()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    write_jsonl(str(out_path), embedded)
+
+    print(f"[OK] Embedded {len(embedded)} chunks → {out_path}")
+
+
+if __name__ == "__main__":
+    main()

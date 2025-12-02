@@ -19,9 +19,9 @@ BODY_TYPES: Set[str] = {
     "address",
     "emailaddress",
     "image",
+    "figurecaption",
 }
 TABLE_TYPES: Set[str] = {"table"}
-CAPTION_TYPES: Set[str] = {"figurecaption"}
 NOISE_TYPES: Set[str] = {"header", "footer", "pagenumber", "pagebreak"}
 
 
@@ -34,7 +34,7 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
 
     Args:
         elements: Element dictionaries emitted by ``extract_elements`` (holding
-            ``source_doc``, ``doc_id``, ``type``, ``text``, and ``page`` info).
+            ``source_doc``, ``type``, ``text``, and ``page`` info).
 
     Returns:
         A list of chunk dictionaries ready for embedding / retrieval.
@@ -52,7 +52,6 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
     current_indices: List[int] = []
     current_tokens = 0
     current_section: Optional[str] = None
-    pending_caption: Optional[str] = None
     chunk_id = 1
 
     def flush_text_chunk() -> None:
@@ -94,10 +93,6 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
                 current_section = text
             continue
 
-        if etype in CAPTION_TYPES:
-            pending_caption = text
-            continue
-
         if etype in TABLE_TYPES:
             flush_text_chunk()
             chunk = {
@@ -114,9 +109,6 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
             table_html = el.get("table_as_html")
             if table_html:
                 chunk["text_as_html"] = table_html
-            if pending_caption:
-                chunk["caption"] = pending_caption
-                pending_caption = None
             chunks.append(chunk)
             chunk_id += 1
             continue

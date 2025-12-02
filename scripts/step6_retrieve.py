@@ -9,6 +9,6 @@ if __name__ == "__main__":
     question = "What was PepsiCo's total revenue in 2022?"
     hits = retrieve_topk(question, topk=5, source_doc="28")  # 28.pdf로 제한
     for i, h in enumerate(hits, 1):
-        loc = f"{h['doc_id']} (p{h['page_start']}-{h['page_end']})"
+        loc = f"{h['source_doc']} (p{h['page_start']}-{h['page_end']})"
         print(f"\n[{i}] {loc} — {h['type']}")
         print(h["text"][:500], "...")

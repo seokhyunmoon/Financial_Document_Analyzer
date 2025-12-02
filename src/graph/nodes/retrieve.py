@@ -58,10 +58,11 @@ def retrieve_topk(
 
         return_props = [
             "source_doc",
-            "doc_id",
             "chunk_id",
             "element_type",
+             "section_title",
             "text",
+            "text_as_html",
             "page_start",
             "page_end",
         ]
@@ -99,11 +100,12 @@ def retrieve_topk(
             hits.append({
                 "chunk_id":   props.get("chunk_id"),
                 "source_doc": props.get("source_doc"),
-                "doc_id":     props.get("doc_id"),
                 "type":       props.get("element_type"),
+                "section_title": props.get("section_title"),
                 "page_start": props.get("page_start"),
                 "page_end":   props.get("page_end"),
                 "text":       props.get("text"),
+                "text_as_html": props.get("text_as_html"),
             })
         logger.info(
             f"[OK] Retrieved {len(hits)}/{topk} hits from '{collection_name}' mode={retriever_mode}"

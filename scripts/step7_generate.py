@@ -27,7 +27,7 @@ def main():
 
     print(f"\n[HITS] {len(hits)} results")
     for i, h in enumerate(hits, 1):
-        loc = f"{h.get('doc_id')} p{h.get('page_start')}-{h.get('page_end')}"
+        loc = f"{h.get('source_doc')} p{h.get('page_start')}-{h.get('page_end')}"
         typ = h.get("type")
         text = (h.get("text") or "").replace("\n", " ")
         if len(text) > PREVIEW_LEN:
