@@ -83,25 +83,21 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
         if not text_clean.strip():
             continue
 
-        #metadata
+        # metadata
         meta = getattr(element, "metadata", None)
-        element_id = meta.element_id if (meta and hasattr(meta, "element_id")) else None
-        page = meta.page_number if (meta and hasattr(meta, "page_number")) else None
-        table_as_html = meta.text_as_html if (meta and hasattr(meta, "text_as_html")) else None
-        
+        page = getattr(meta, "page_number", None)
+        table_as_html = getattr(meta, "text_as_html", None)
 
-        out.append(
-            {
-                "source_doc": doc_id,
-                "type": type,
-                "text": text_clean,
-                "metadata": {
-                    "element_id": element_id,
-                    "page": page,
-                    "table_as_html": table_as_html,
-                },
-            }
-        )
+        record = {
+            "source_doc": doc_id,
+            "type": type,
+            "text": text_clean,
+            "page": page,
+        }
+        if table_as_html:
+            record["table_as_html"] = table_as_html
+
+        out.append(record)
 
     # Ensure deterministic order by page number
     out.sort(key=lambda r: (r.get("page") or 0))
