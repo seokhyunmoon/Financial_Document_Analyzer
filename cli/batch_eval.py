@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 """
-Run LangGraph QA against FinanceBench dataset and log results to JSONL.
+Batch FinanceBench QA evaluator.
 
-example:
-    python cli/batch_eval.py --docs AMERICANEXPRESS_2022_10K
+Examples:
+    # Evaluate every FinanceBench question
+    python cli/batch_eval.py
+
+    # Restrict to one document and write to a custom path
+    python cli/batch_eval.py --docs AMERICANEXPRESS_2022_10K --output data/logs/amex.jsonl
 """
 
 from __future__ import annotations
@@ -21,7 +25,7 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from graph.state import build_graph
 from services.evaluate import qa_evaluate
-from utils.config import load_config
+from utils.config import load_config, get_section
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -41,9 +45,6 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=None,
         help="Optional output path (JSONL). Default=data/logs/financebench_eval_<ts>.jsonl",
-    )
-    parser.add_argument(
-        "--topk", type=int, default=10, help="Retrieval top-k passed to LangGraph"
     )
     return parser.parse_args()
 
@@ -76,6 +77,8 @@ def main() -> None:
     """Execute batch QA + evaluation against FinanceBench."""
     args = parse_args()
     cfg = load_config()
+    qa_cfg = get_section(cfg, "qa")
+    topk = int(qa_cfg.get("topk", 10))
     paths = cfg.get("paths", {})
     dataset_path = Path(paths.get("financebench_dir", "data/financebench")) / "financebench_open_source.jsonl"
     if not dataset_path.exists():
@@ -127,7 +130,7 @@ def main() -> None:
                 result = app.invoke(
                     {
                         "question": question,
-                        "topk": args.topk,
+                        "topk": topk,
                         "source_doc": doc_name,
                     }
                 )

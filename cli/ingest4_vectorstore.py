@@ -60,7 +60,7 @@ def main() -> None:
     emb_dir = args.embeddings_dir or Path(paths.get("embed_dir", "data/processed/embeddings"))
     emb_dir = emb_dir.resolve()
     if not emb_dir.exists():
-        logger.error(f"[ERR] Embeddings directory not found: {emb_dir}")
+        logger.error(f"[ERROR] Embeddings directory not found: {emb_dir}")
         return
 
     files = sorted(emb_dir.glob("*.jsonl"))
