@@ -1,5 +1,11 @@
 #!/usr/bin/env python
-"""Run LangGraph QA against FinanceBench dataset and log results to JSONL."""
+"""
+Run LangGraph QA against FinanceBench dataset and log results to JSONL.
+
+example:
+    python cli/batch_eval.py --docs AMERICANEXPRESS_2022_10K
+"""
+
 from __future__ import annotations
 
 import argparse

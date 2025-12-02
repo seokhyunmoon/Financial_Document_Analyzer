@@ -3,7 +3,7 @@
 Simple CLI to run chunking on a single document's elements.
 
 Example:
-    python scripts/step2_chunking.py --elements data/elements/AMERICANEXPRESS_2022_10K_elements.jsonl
+    python cli/ingest2_chunking.py --elements data/elements/AMERICANEXPRESS_2022_10K_elements.jsonl
 """
 
 import argparse

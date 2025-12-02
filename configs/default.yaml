@@ -5,7 +5,6 @@ paths:
   elements_dir: data/processed/elements
   chunks_dir: data/processed/chunks
   embed_dir: data/processed/embeddings
-  
 
 # src/ingestion/elements.py
 partitioning:
@@ -23,11 +22,9 @@ cleaning:
     extra_whitespace: true
     dashes: false
 
-
 # src/ingestion/chunking.py
 chunking:
   max_tokens: 512
-
 
 # src/ingestion/embeddings.py
 embedding:
@@ -35,14 +32,13 @@ embedding:
   batch_size: 8
   normalize_embeddings: true
 
-
 # src/ingestion/vectorstore.py
 vectordb:
   use_docker: false
   init:
     host: localhost
-    port: 8080
-    grpc_port: 50051
+    port: 8090
+    grpc_port: 50061
     skip_init_checks: true
   embedded:
     persistence_data_path: "data/weaviate"
@@ -54,7 +50,6 @@ vectordb:
     concurrent_requests: 4
     upsert: true
 
-
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
@@ -64,13 +59,11 @@ qa:
     enabled: false
     topk: 10
 
-
 # /src/graph/nodes/generate.py
 generate:
   provider: ollama
   model_name: qwen3:8b
   think: true
-
 
 # /src/services/evaluate.py
 evaluate:

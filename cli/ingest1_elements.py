@@ -2,7 +2,7 @@
 """Ad-hoc helper to run element extraction against a single PDF.
 
 Example:
-    python scripts/step1_elements.py --pdf data/pdfs/AMERICANEXPRESS_2022_10K.pdf
+    python cli/ingest1_elements.py --pdf data/pdfs/AMERICANEXPRESS_2022_10K.pdf
 """
 import argparse
 import json

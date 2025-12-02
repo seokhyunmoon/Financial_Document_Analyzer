@@ -3,7 +3,7 @@
 Generate embeddings for a single chunk file.
 
 Example:
-    python scripts/step3_embed.py --chunks data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl
+    python cli/ingest3_embed.py --chunks data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl
 """
 
 import argparse
