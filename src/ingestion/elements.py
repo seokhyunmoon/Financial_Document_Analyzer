@@ -8,8 +8,11 @@ to a simplified schema for downstream processing.
 """
 import re
 from typing import List, Dict, Any, Optional
+
+import torch
 from unstructured.partition.pdf import partition_pdf
 from unstructured.cleaners.core import replace_unicode_quotes, clean 
+
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 
@@ -47,11 +50,24 @@ def extract_elements(doc_path: str, doc_id: str) -> List[Dict[str, Any]]:
     ucfg = get_section(cfg, "partitioning")
     cleaning_cfg = get_section(cfg, "cleaning")
 
+    # Log GPU status for hi_res pipelines
+    cuda_available = torch.cuda.is_available()
+    device_name = torch.cuda.get_device_name(0) if cuda_available else "None"
+    hi_res_model = ucfg.get("hi_res_model_name", "yolox")
+    logger.info(
+        "[INFO] strategy=%s hi_res_model=%s gpu_available=%s gpu_devices=%s gpu_current=%s",
+        ucfg.get("strategy", "auto"),
+        hi_res_model,
+        cuda_available,
+        torch.cuda.device_count() if cuda_available else 0,
+        device_name,
+    )
+
     # Extract elements using configured options
     elements = partition_pdf(
         filename=doc_path,
         strategy=ucfg.get("strategy", "hi_res"),
-        hi_res_model_name=ucfg.get("hi_res_model", "yolox"),
+        hi_res_model_name=hi_res_model,
         languages=ucfg.get("languages", ["eng"]),
         infer_table_structure=ucfg.get("infer_table_structure", True),
     )

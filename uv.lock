@@ -545,6 +545,7 @@ dependencies = [
     { name = "torch" },
     { name = "tqdm" },
     { name = "unstructured", extra = ["local-inference", "pdf"] },
+    { name = "unstructured-inference" },
     { name = "weaviate-client" },
 ]
 
@@ -571,6 +572,7 @@ requires-dist = [
     { name = "torch", specifier = ">=2.9.0" },
     { name = "tqdm", specifier = ">=4.67.1" },
     { name = "unstructured", extras = ["local-inference", "pdf"], specifier = ">=0.18.15" },
+    { name = "unstructured-inference", specifier = ">=1.0.5" },
     { name = "weaviate-client", specifier = ">=4.17.0" },
 ]
 

@@ -10,7 +10,7 @@ paths:
 # src/ingestion/elements.py
 partitioning:
   strategy: hi_res
-  hi_res_model: yolox
+  hi_res_model_name: yolox
   languages:
     - eng
   infer_table_structure: true
