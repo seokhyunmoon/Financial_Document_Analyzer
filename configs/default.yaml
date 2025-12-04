@@ -24,7 +24,7 @@ cleaning:
 
 # src/ingestion/chunking.py
 chunking:
-  max_tokens: 512
+  max_tokens: 256
 
 # src/ingestion/embeddings.py
 embedding:
