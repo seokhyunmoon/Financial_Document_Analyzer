@@ -1,13 +1,20 @@
 # src/graph/models/ollama.py
 from typing import List, Dict, Any, Type, Optional
+import json
+
 from ollama import Client
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
+
+from utils.logger import get_logger
 
 
 class QAResponse(BaseModel):
     """Default schema used by the QA generator."""
     answer: str
     citations: list[int] | None = None
+
+
+logger = get_logger(__name__)
 
 
 def ollama_chat_structured(
@@ -29,17 +36,48 @@ def ollama_chat_structured(
     """
     
     client = Client()
+    schema = schema_model.model_json_schema()
+    schema_str = json.dumps(schema, ensure_ascii=False)
+    base_messages = list(messages)
+    last_error: Optional[Exception] = None
+
     try:
-        chat_kwargs: Dict[str, Any] = {
-            "model": model_name,
-            "messages": messages,
-            "format": schema_model.model_json_schema(),
-            "options": {},
-        }
-        if think is not None:
-            chat_kwargs["think"] = think
-        resp = client.chat(**chat_kwargs)
-        return schema_model.model_validate_json(resp["message"]["content"]).model_dump()
+        for attempt in range(3):
+            chat_kwargs: Dict[str, Any] = {
+                "model": model_name,
+                "messages": base_messages,
+                "format": schema,
+                "options": {},
+            }
+            if think is not None:
+                chat_kwargs["think"] = think
+            resp = client.chat(**chat_kwargs)
+            content = resp["message"]["content"]
+            try:
+                return schema_model.model_validate_json(content).model_dump()
+            except ValidationError as err:
+                last_error = err
+                logger.warning(
+                    "[WARN] Ollama returned invalid JSON (attempt %d/%d): %s",
+                    attempt + 1,
+                    3,
+                    str(err),
+                )
+                # Append guidance and retry.
+                base_messages = list(messages)
+                base_messages.append(
+                    {
+                        "role": "system",
+                        "content": (
+                            "Your previous response was not valid JSON. "
+                            "Respond again with JSON only, matching this schema:\n"
+                            f"{schema_str}"
+                        ),
+                    }
+                )
+        if last_error:
+            raise last_error
+        raise RuntimeError("Failed to obtain structured response from Ollama.")
     finally:
         if hasattr(client, "_client") and client._client:
             client._client.close()
