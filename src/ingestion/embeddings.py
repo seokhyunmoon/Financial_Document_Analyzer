@@ -10,10 +10,17 @@ from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from torch import cuda
+import torch
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 
 logger = get_logger(__name__)
+
+_MODEL_CACHE = {
+    "model": None,
+    "name": None,
+    "device": None,
+}
 
 
 def _text_for_embedding(chunk):
@@ -30,6 +37,21 @@ def _text_for_embedding(chunk):
         parts.append(chunk["section_title"])
     parts.append(chunk.get("text") or "")
     return "\n".join(part for part in parts if part)
+
+
+def _get_model(model_name: str, device: str) -> SentenceTransformer:
+    """Load or reuse a SentenceTransformer on the requested device."""
+    cached = _MODEL_CACHE["model"]
+    if cached is not None and _MODEL_CACHE["name"] == model_name and _MODEL_CACHE["device"] == device:
+        return cached
+
+    if cached is not None and device == "cuda":
+        torch.cuda.empty_cache()
+
+    logger.info(f"[INFO] Loading embedding model {model_name} on {device.upper()} ...")
+    model = SentenceTransformer(model_name, device=device)
+    _MODEL_CACHE.update({"model": model, "name": model_name, "device": device})
+    return model
 
 
 def generate_embeddings(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -54,9 +76,9 @@ def generate_embeddings(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     device = "cuda" if cuda.is_available() else "cpu"
     logger.info(f"[INFO] Using {device.upper()} device for embedding generation.")
     
-    # 3) load model
+    # 3) load model (reuse cached instance when possible)
     try:
-        model = SentenceTransformer(model_name, device=device)
+        model = _get_model(model_name, device)
     except Exception as e:
         logger.error(f"[ERROR] Failed to load model {model_name}: {e}")
         raise
