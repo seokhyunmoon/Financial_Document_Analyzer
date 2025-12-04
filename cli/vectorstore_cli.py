@@ -3,11 +3,11 @@
 Utility script to reset or inspect the Weaviate collection.
 
 Examples:
-    python cli/vectordb_admin.py --reset
-    python cli/vectordb_admin.py --count
-    python cli/vectordb_admin.py --reset --count
-    python cli/vectordb_admin.py --list
-    python cli/vectordb_admin.py --schema
+    python cli/vectorstore_cli.py --reset
+    python cli/vectorstore_cli.py --count
+    python cli/vectorstore_cli.py --reset --count
+    python cli/vectorstore_cli.py --list
+    python cli/vectorstore_cli.py --schema
 """
 
 
