@@ -8,6 +8,9 @@ Examples:
 
     # Restrict to one document and write to a custom path
     python cli/batch_eval.py --docs AMERICANEXPRESS_2022_10K --output data/logs/amex.jsonl
+
+    # Evaluate only documents currently indexed in the vector store
+    python cli/batch_eval.py --indexed-only
 """
 
 from __future__ import annotations
@@ -27,6 +30,7 @@ from graph.state import build_graph
 from services.evaluate import qa_evaluate
 from utils.config import load_config, get_section
 from utils.logger import get_logger
+from utils.inventory import list_available_documents
 
 logger = get_logger(__name__)
 
@@ -45,6 +49,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=None,
         help="Optional output path (JSONL). Default=data/logs/financebench_eval_<ts>.jsonl",
+    )
+    parser.add_argument(
+        "--indexed-only",
+        action="store_true",
+        help="Restrict evaluation to documents that are currently indexed in the vector store.",
     )
     return parser.parse_args()
 
@@ -86,6 +95,27 @@ def main() -> None:
         return
 
     docs = [d for d in args.docs.split(",") if d.strip()] if args.docs else []
+    if args.indexed_only:
+        indexed_docs = [name for name, _ in list_available_documents()]
+        if not indexed_docs:
+            logger.warning("[WARN] No indexed documents found; nothing to evaluate.")
+            return
+        if docs:
+            orig = docs.copy()
+            docs = [d for d in docs if d in indexed_docs]
+            missing = sorted(set(orig) - set(docs))
+            if missing:
+                logger.warning(
+                    "[WARN] Skipping %d doc(s) not indexed: %s",
+                    len(missing),
+                    ", ".join(missing[:10]) + (" ..." if len(missing) > 10 else ""),
+                )
+        else:
+            docs = indexed_docs
+
+    if args.indexed_only and not docs:
+        logger.warning("[WARN] Indexed-only evaluation requested but no matching documents remain.")
+        return
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_path = (
@@ -145,6 +175,7 @@ def main() -> None:
                     generated_answer=model_answer,
                 )
                 classification = eval_result.get("classification")
+                reasoning = eval_result.get("reasoning")
 
                 record.update(
                     {
@@ -152,6 +183,7 @@ def main() -> None:
                         "citations": citations,
                         "hits": hits,
                         "eval_classification": classification,
+                        "reasoning": reasoning,
                     }
                 )
             except Exception as exc:
@@ -164,6 +196,7 @@ def main() -> None:
                         "hits": [],
                         "eval_classification": "ERROR",
                         "error": str(exc),
+                        "reasoning": "",
                     }
                 )
 
