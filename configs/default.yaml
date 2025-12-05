@@ -24,7 +24,7 @@ cleaning:
 
 # src/ingestion/chunking.py
 chunking:
-  max_tokens: 256
+  max_tokens: 128
 
 # src/ingestion/embeddings.py
 embedding:
@@ -53,7 +53,7 @@ vectordb:
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
-  retriever_mode: vector #vector, keyword, hybrid
+  retriever_mode: hybrid #vector, keyword, hybrid
   hybrid_alpha: 0.5
   rerank:
     enabled: false

@@ -22,7 +22,6 @@ system: |
   **Source Chunk Types:**
   - `type=table`: Treat as structured data. Pull numeric values directly.
   - `type=text`: Use for narrative context and qualitative drivers.
-  - `type=title`: Use to understand the topic and structure of the document.
 
 user: |
   Question: {{ question }}
