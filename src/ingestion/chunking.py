@@ -19,9 +19,12 @@ BODY_TYPES: Set[str] = {
     "emailaddress",
     "image",
     "figurecaption",
+    "footer", 
+    "pagenumber", 
+    "pagebreak"
 }
 TABLE_TYPES: Set[str] = {"table"}
-NOISE_TYPES: Set[str] = {"footer", "pagenumber", "pagebreak"}
+NOISE_TYPES: Set[str] = {}
 
 
 def _token_len(encoder, text: str) -> int:
@@ -43,13 +46,19 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
 
     cfg = load_config()
     chunk_cfg = get_section(cfg, "chunking")
-    max_tokens = int(chunk_cfg.get("max_tokens", 128))
-    encoder = tiktoken.get_encoding("cl100k_base")
+    chunk_mode = str(chunk_cfg.get("mode", "tokens")).lower()
+    if chunk_mode == "chars":
+        max_len = int(chunk_cfg.get("max_char", 2048))
+        encoder = None
+    else:
+        chunk_mode = "tokens"
+        max_len = int(chunk_cfg.get("max_tokens", 128))
+        encoder = tiktoken.get_encoding("cl100k_base")
 
     chunks: List[Dict[str, Any]] = []
     current_chunk: List[Dict[str, Any]] = []
     current_indices: List[int] = []
-    current_tokens = 0
+    current_len = 0
     current_titles: List[str] = []
     active_section: Optional[str] = None
     chunk_section_at_start: Optional[str] = None
@@ -73,7 +82,7 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
     def flush_text_chunk() -> None:
         """Emit the accumulated text chunk (if any) to the output list."""
 
-        nonlocal current_chunk, current_indices, current_tokens, chunk_id, chunk_section_at_start
+        nonlocal current_chunk, current_indices, current_len, chunk_id, chunk_section_at_start
         if not current_chunk:
             return
         merged = " ".join(el.get("text", "").strip() for el in current_chunk if el.get("text"))
@@ -93,7 +102,7 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
         chunk_id += 1
         current_chunk = []
         current_indices = []
-        current_tokens = 0
+        current_len = 0
         chunk_section_at_start = None
 
     for idx, el in enumerate(tqdm(elements, desc="Merging elements")):
@@ -133,11 +142,11 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
             continue
 
         if etype in BODY_TYPES or not etype:
-            token_len = _token_len(encoder, text)
+            unit_len = len(text) if chunk_mode == "chars" else _token_len(encoder, text)
             if not current_chunk:
                 chunk_section_at_start = _consume_titles()
 
-            if token_len > max_tokens:
+            if unit_len > max_len:
                 flush_text_chunk()
                 section_for_segment = _consume_titles() or chunk_section_at_start
                 chunk = {
@@ -155,14 +164,14 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
                 chunk_id += 1
                 continue
 
-            if current_tokens + token_len > max_tokens:
+            if current_len + unit_len > max_len:
                 flush_text_chunk()
                 if not chunk_section_at_start:
                     chunk_section_at_start = _consume_titles()
 
             current_chunk.append(el)
             current_indices.append(idx)
-            current_tokens += token_len
+            current_len += unit_len
             continue
 
     flush_text_chunk()

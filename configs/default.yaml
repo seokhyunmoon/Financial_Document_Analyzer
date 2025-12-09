@@ -18,13 +18,15 @@ cleaning:
   apply_unicode_quotes: true
   apply_clean: true
   clean_options:
-    bullets: false
+    bullets: true #false
     extra_whitespace: true
-    dashes: false
+    dashes: true #false
 
 # src/ingestion/chunking.py
 chunking:
+  mode: chars  # tokens | chars
   max_tokens: 128
+  max_char: 2048
 
 # src/ingestion/embeddings.py
 embedding:
@@ -53,7 +55,7 @@ vectordb:
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
-  retriever_mode: hybrid #vector, keyword, hybrid
+  retriever_mode: vector #vector, keyword, hybrid
   hybrid_alpha: 0.5
   rerank:
     enabled: false
