@@ -5,7 +5,7 @@ Render a FinanceBench evaluation JSONL file to a single HTML report grouped by
 extension.
 
 Example:
-    python scripts/export_eval_html.py --input data/logs/financebench_eval_20251208_100732.jsonl
+    python cli/export_eval_html.py --input data/logs/financebench_eval_20251208_100732.jsonl
 """
 from __future__ import annotations
 
