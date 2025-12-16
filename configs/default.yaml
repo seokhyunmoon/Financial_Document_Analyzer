@@ -24,13 +24,13 @@ cleaning:
 
 # src/ingestion/chunking.py
 chunking:
-  mode: chars  # tokens | chars
+  mode: tokens # tokens | chars
   max_tokens: 128
   max_char: 2048
 
 # src/ingestion/embeddings.py
 embedding:
-  model_name: Qwen/Qwen3-Embedding-4B
+  model_name: Qwen/Qwen3-Embedding-8B
   batch_size: 8
   normalize_embeddings: true
 
@@ -55,8 +55,11 @@ vectordb:
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
-  retriever_mode: vector #vector, keyword, hybrid
-  hybrid_alpha: 0.5
+  retriever_mode: hybrid #vector, keyword, hybrid
+  hybrid_alpha: 0.9
+  keyword_properties:
+    - text
+    - section_title
   rerank:
     enabled: false
     topk: 10
@@ -65,10 +68,10 @@ qa:
 generate:
   provider: ollama
   model_name: qwen3:8b
-  think: true
+  # think: true
 
 # /src/services/evaluate.py
 evaluate:
   provider: ollama
   model_name: gpt-oss:20b
-  think: high
+  # think: high
