@@ -38,6 +38,7 @@ def retrieve_topk(
     topk = topk or qsec.get("topk", 10)
     retriever_mode = (mode or qsec.get("retriever_mode", "vector")).lower()
     hybrid_alpha = float(qsec.get("hybrid_alpha", 0.5))
+    keyword_props = qsec.get("keyword_properties", ["text", "section_title"])
     collection_name = vsec.get("collection_name", "FinancialDocChunk")
 
     needs_vector = retriever_mode in ("vector", "hybrid")
@@ -60,7 +61,7 @@ def retrieve_topk(
             "source_doc",
             "chunk_id",
             "element_type",
-             "section_title",
+            "section_title",
             "text",
             "text_as_html",
             "page_start",
@@ -79,6 +80,7 @@ def retrieve_topk(
             res = collection.query.bm25(
                 query=question,
                 limit=topk,
+                properties=keyword_props,
                 filters=w_filter,
                 return_properties=return_props,
             )
@@ -88,6 +90,7 @@ def retrieve_topk(
                 vector=question_vector,
                 alpha=hybrid_alpha,
                 limit=topk,
+                query_properties=keyword_props,
                 filters=w_filter,
                 return_properties=return_props,
             )
