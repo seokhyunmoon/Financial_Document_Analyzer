@@ -19,15 +19,11 @@ system: |
 
   4.  **Final Output:** Return ONLY a JSON object with keys: "answer" (string) and "citations" (array of integers referring to the [i] indices).
 
-  **Source Chunk Types:**
-  - `type=table`: Treat as structured data. Pull numeric values directly.
-  - `type=text`: Use for narrative context and qualitative drivers.
-
 user: |
   Question: {{ question }}
 
   Sources:
   {% for i, k in topk %}
-  [{{ i }}] {{ k.source_doc }} | chunk={{ k.chunk_id }} | type={{ k.type }} | pages {{ k.page_start }}-{{ k.page_end }}
+  [{{ i }}] {{ k.source_doc }} | chunk={{ k.chunk_id }} | type={{ k.type }} | section={{ k.section_title }} | pages {{ k.page_start }}-{{ k.page_end }}
   {{ k.text }}
   {% endfor %}
