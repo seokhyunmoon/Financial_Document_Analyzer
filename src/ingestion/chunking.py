@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Dict, Any, Optional, Set
 import tiktoken
+from html_to_markdown import convert_to_markdown
 from tqdm import tqdm
 from utils.logger import get_logger
 from utils.config import load_config, get_section
@@ -25,6 +26,19 @@ BODY_TYPES: Set[str] = {
 }
 TABLE_TYPES: Set[str] = {"table"}
 NOISE_TYPES: Set[str] = {}
+
+
+def _table_markdown(table_html: str, text_fallback: str) -> str:
+    """Flatten table HTML to markdown; fall back to existing text if unavailable."""
+    if convert_to_markdown and table_html:
+        try:
+            md = convert_to_markdown(table_html) or ""
+            md = md.strip()
+            if md:
+                return md
+        except Exception:
+            pass
+    return text_fallback
 
 
 def _token_len(encoder, text: str) -> int:
@@ -123,18 +137,19 @@ def merge_elements_to_chunks(elements: List[Dict[str, Any]]) -> List[Dict[str, A
         if etype in TABLE_TYPES:
             flush_text_chunk()
             section_for_table = _consume_titles() or chunk_section_at_start
+            table_html = el.get("table_as_html")
+            table_text = _table_markdown(table_html, text)
             chunk = {
                 "source_doc": el.get("source_doc"),
                 "chunk_id": chunk_id,
                 "type": "table",
-                "text": text,
+                "text": table_text,
                 "page_start": el.get("page"),
                 "page_end": el.get("page"),
                 "source_elements": [idx],
             }
             if section_for_table:
                 chunk["section_title"] = section_for_table
-            table_html = el.get("table_as_html")
             if table_html:
                 chunk["text_as_html"] = table_html
             chunks.append(chunk)

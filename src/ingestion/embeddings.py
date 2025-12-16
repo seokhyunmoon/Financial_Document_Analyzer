@@ -84,7 +84,8 @@ def generate_embeddings(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         raise
 
     # 4) generate embeddings
-    texts = [_text_for_embedding(c) for c in chunks]
+    # texts = [_text_for_embedding(c) for c in chunks] # previous implementation: embeds both title and text
+    texts = [c["text"] for c in chunks] # new implementation: embed only the text content
     logger.info(f"[INFO] Generating embeddings for {len(texts)} chunks...")
 
     embeddings = model.encode(
