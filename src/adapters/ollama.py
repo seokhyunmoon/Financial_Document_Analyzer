@@ -8,12 +8,6 @@ from pydantic import BaseModel, ValidationError
 from utils.logger import get_logger
 
 
-class QAResponse(BaseModel):
-    """Default schema used by the QA generator."""
-    answer: str
-    citations: list[int] | None = None
-
-
 logger = get_logger(__name__)
 
 

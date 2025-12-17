@@ -1,18 +1,13 @@
 # src/services/evaluate.py
 import json
 from typing import Dict, Any
-from pydantic import BaseModel
 from adapters.ollama import ollama_chat_structured
+from graph.schemas import EvalResponse
 from utils.logger import get_logger
 from utils.config import load_config, get_section
 from utils.prompts import load_prompt, render_prompt
 
 logger = get_logger(__name__)
-
-class EvalResponse(BaseModel):
-    """Pydantic model for the structured JSON output from the evaluation prompt."""
-    classification: str
-    reasoning: str
 
 def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict:
     """Compare generated answer with ground truth using an LLM judge.
