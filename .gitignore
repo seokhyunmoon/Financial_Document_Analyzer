@@ -3,7 +3,8 @@
 .venv/
 __pycache__/
 *.pyc
-.env
 
-data/
-papers/
+# Ignore all data artifacts except logs
+data/**
+!data/logs/
+!data/logs/**
