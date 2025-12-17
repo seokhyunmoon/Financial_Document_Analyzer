@@ -5,6 +5,7 @@ paths:
   elements_dir: data/processed/elements
   chunks_dir: data/processed/chunks
   embed_dir: data/processed/embeddings
+  metadata_dir: data/processed/metadata
 
 # src/ingestion/elements.py
 partitioning:
@@ -18,9 +19,9 @@ cleaning:
   apply_unicode_quotes: true
   apply_clean: true
   clean_options:
-    bullets: true #false
+    bullets: true
     extra_whitespace: true
-    dashes: true #false
+    dashes: true
 
 # src/ingestion/chunking.py
 chunking:
@@ -55,7 +56,7 @@ vectordb:
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
-  retriever_mode: hybrid #vector, keyword, hybrid
+  retriever_mode: vector #vector, keyword, hybrid
   hybrid_alpha: 0.9
   keyword_properties:
     - text
@@ -68,6 +69,14 @@ qa:
 generate:
   provider: ollama
   model_name: qwen3:8b
+  # think: true
+
+# /src/ingestion/metadata.py
+metadata:
+  provider: ollama
+  model_name: qwen3:8b
+  max_keywords: 6
+  summary_lines: 3
   # think: true
 
 # /src/services/evaluate.py
