@@ -36,7 +36,14 @@ metadata:
   model_name: qwen3:8b
   max_keywords: 6
   summary_lines: 3
-  # think: true
+  max_workers: 4
+  retry: 3
+  ollama_hosts:
+    - http://127.0.0.1:11435
+    - http://127.0.0.1:11436
+    - http://127.0.0.1:11437
+    - http://127.0.0.1:11438
+
 
 # src/ingestion/embeddings.py
 embedding:
@@ -91,4 +98,3 @@ evaluate:
   provider: ollama
   model_name: gpt-oss:20b
   # think: high
-

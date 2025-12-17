@@ -16,6 +16,7 @@ def ollama_chat_structured(
     messages: List[Dict[str, str]],
     schema_model: Type[BaseModel],
     think: Optional[Any] = None,
+    host: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Call the Ollama chat endpoint and validate the response.
 
@@ -24,12 +25,13 @@ def ollama_chat_structured(
         messages: Chat message dicts passed to the model.
         schema_model: Pydantic schema used to validate the JSON response.
         think: Optional thinking-mode setting (bool for most models or str such as 'low').
+        host: Optional Ollama host URL to target (e.g. ``http://127.0.0.1:11435``).
 
     Returns:
         Parsed response as ``schema_model.model_dump()``.
     """
     
-    client = Client()
+    client = Client(host=host) if host else Client()
     schema = schema_model.model_json_schema()
     schema_str = json.dumps(schema, ensure_ascii=False)
     base_messages = list(messages)
