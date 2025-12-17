@@ -29,6 +29,15 @@ chunking:
   max_tokens: 128
   max_char: 2048
 
+# /src/ingestion/metadata.py
+metadata:
+  enabled: true
+  provider: ollama
+  model_name: qwen3:8b
+  max_keywords: 6
+  summary_lines: 3
+  # think: true
+
 # src/ingestion/embeddings.py
 embedding:
   model_name: Qwen/Qwen3-Embedding-8B
@@ -53,6 +62,12 @@ vectordb:
     concurrent_requests: 4
     upsert: true
 
+# /src/graph/nodes/generate.py
+generate:
+  provider: ollama
+  model_name: qwen3:8b
+  # think: true
+
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
@@ -61,23 +76,14 @@ qa:
   keyword_properties:
     - text
     - section_title
-  rerank:
-    enabled: false
-    topk: 10
 
-# /src/graph/nodes/generate.py
-generate:
-  provider: ollama
+# /src/graph/nodes/rerank.py
+rerank:
+  enabled: false
   model_name: qwen3:8b
-  # think: true
-
-# /src/ingestion/metadata.py
-metadata:
-  enabled: true
-  provider: ollama
-  model_name: qwen3:8b
-  max_keywords: 6
-  summary_lines: 3
+  topk: 10
+  max_candidates: 5
+  max_tokens: 128
   # think: true
 
 # /src/services/evaluate.py
@@ -85,3 +91,4 @@ evaluate:
   provider: ollama
   model_name: gpt-oss:20b
   # think: high
+

@@ -60,16 +60,15 @@ def node_generate(state: QAState) -> QAState:
     return state
 
 def node_rerank(state: QAState) -> QAState:
-    """Optionally rerank retrieved hits using the same embedder.
+    """Optionally rerank retrieved hits using an LLM judge.
 
     Args:
-        state: LangGraph state containing the question embedding and hits.
+        state: LangGraph state containing the question and hits.
 
     Returns:
         The updated state with reranked ``hits``.
     """
     state["hits"] = rerank_hits(
-        state.get("question_vector"),
         state.get("hits", []),
         question=state.get("question"),
     )
@@ -83,8 +82,7 @@ def build_graph() -> StateGraph:
         A compiled LangGraph graph ready for invocation.
     """
     cfg = load_config()
-    qsec = get_section(cfg, "qa")
-    rerank_cfg = get_section(qsec, "rerank")
+    rerank_cfg = get_section(cfg, "rerank")
     use_rerank = bool(rerank_cfg.get("enabled", False))
 
     g = StateGraph(QAState)

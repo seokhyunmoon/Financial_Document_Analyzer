@@ -34,3 +34,12 @@ class ChunkMetadata(BaseModel):
 
     summary: str = Field(..., description="2-3 sentence summary of the chunk.")
     keywords: List[str] = Field(..., description="Up to N short keyword phrases.")
+
+
+class RerankResponse(BaseModel):
+    """Schema for LLM-based rerank output."""
+
+    ranked_ids: List[int] = Field(
+        ...,
+        description="Ranked candidate ids from most to least relevant (1-based).",
+    )
