@@ -2,6 +2,11 @@
 """
 Generate LLM metadata (summary and keywords) for one or more chunk files.
 
+Notes:
+    - By default, existing summary/keywords cause a chunk to be skipped.
+    - Re-running without --overwrite refills missing metadata only.
+    - Use --overwrite to regenerate all metadata entries.
+
 Examples:
     # Enrich every *_chunks.jsonl under paths.chunks_dir
     python cli/ingest3_metadata.py

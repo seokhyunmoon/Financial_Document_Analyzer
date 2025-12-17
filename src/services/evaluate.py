@@ -9,13 +9,19 @@ from utils.prompts import load_prompt, render_prompt
 
 logger = get_logger(__name__)
 
-def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict:
+def qa_evaluate(
+    question: str,
+    ground_truth: str,
+    generated_answer: str,
+    host: str | None = None,
+) -> dict:
     """Compare generated answer with ground truth using an LLM judge.
 
     Args:
         question: The original question text.
         ground_truth: Reference answer from the dataset.
         generated_answer: Answer produced by the model.
+        host: Optional Ollama host override for this request.
 
     Returns:
         Dict containing the evaluation classification and reasoning.
@@ -47,7 +53,7 @@ def qa_evaluate(question: str, ground_truth: str, generated_answer: str) -> dict
         logger.info(f"[INFO] Running evaluator provider={provider} model={model}")
         # The `ollama_chat_structured` helper attempts to parse the LLM's JSON
         # output into the `EvalResponse` Pydantic model.
-        response_data = ollama_chat_structured(model, message, EvalResponse, think=think)
+        response_data = ollama_chat_structured(model, message, EvalResponse, think=think, host=host)
         
         if response_data:
             logger.info(f"[OK] Evaluation completed classification={response_data.get('classification')}")

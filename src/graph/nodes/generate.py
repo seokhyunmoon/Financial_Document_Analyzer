@@ -99,7 +99,7 @@ def _build_messages(question: str, topk: List[Dict[str, Any]]) -> List[Dict[str,
             {"role": "user",   "content": user}]
 
 
-def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
+def generator(question: str, hits: List[Dict[str, Any]], host: str | None = None) -> dict:
     """Generates an answer to a question using retrieved documents.
 
     This function orchestrates the generation process. It first checks if any
@@ -110,6 +110,7 @@ def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
     Args:
         question: The user's question.
         hits: The list of retrieved document chunks to use as context.
+        host: Optional Ollama host override for this request.
 
     Returns:
         A dictionary containing the generated 'answer', a list of 'Source'
@@ -132,7 +133,7 @@ def generator(question: str, hits: List[Dict[str, Any]]) -> dict:
     
     # generate answer
     if provider == "ollama":
-        response = ollama_chat_structured(model, message, QAResponse, think=think)
+        response = ollama_chat_structured(model, message, QAResponse, think=think, host=host)
     else:
         raise NotImplementedError(f"[ERROR] Provider '{provider}' is not supported.")
     

@@ -94,11 +94,13 @@ def enrich_chunks(chunks: List[Dict[str, Any]], overwrite: bool = False) -> List
     msec = get_section(cfg, "metadata", {})
     provider = msec.get("provider", "ollama")
     model_name = msec.get("model_name", "qwen3:8b")
+    think = msec.get("think", None)
     max_keywords = int(msec.get("max_keywords", 6))
     summary_lines = int(msec.get("summary_lines", 3))
     max_workers = int(msec.get("max_workers", 1))
     retry = int(msec.get("retry", 0))
-    ollama_hosts = msec.get("ollama_hosts", []) or []
+    global_ollama = get_section(cfg, "ollama", {})
+    ollama_hosts = msec.get("ollama_hosts", []) or global_ollama.get("hosts", []) or []
     if isinstance(ollama_hosts, str):
         ollama_hosts = [ollama_hosts] if ollama_hosts else []
     if not isinstance(ollama_hosts, list):
@@ -139,6 +141,7 @@ def enrich_chunks(chunks: List[Dict[str, Any]], overwrite: bool = False) -> List
                     model_name,
                     messages,
                     ChunkMetadata,
+                    think=think,
                     host=host,
                 )
                 summary = (response.get("summary") or "").strip()

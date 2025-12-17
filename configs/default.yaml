@@ -38,11 +38,6 @@ metadata:
   summary_lines: 3
   max_workers: 4
   retry: 3
-  ollama_hosts:
-    - http://127.0.0.1:11435
-    - http://127.0.0.1:11436
-    - http://127.0.0.1:11437
-    - http://127.0.0.1:11438
 
 
 # src/ingestion/embeddings.py
@@ -75,6 +70,14 @@ generate:
   model_name: qwen3:8b
   # think: true
 
+# Shared Ollama settings (optional global host list)
+ollama:
+  hosts:
+    - http://127.0.0.1:11435
+    - http://127.0.0.1:11436
+    - http://127.0.0.1:11437
+    - http://127.0.0.1:11438
+
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
@@ -98,3 +101,8 @@ evaluate:
   provider: ollama
   model_name: gpt-oss:20b
   # think: high
+
+# /cli/batch_eval.py
+batch_eval:
+  max_workers: 2
+  ollama_hosts: []

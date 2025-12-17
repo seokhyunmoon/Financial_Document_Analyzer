@@ -17,6 +17,7 @@ class QAState(TypedDict, total=False):
     answer: Dict[str, Any]
     topk: int
     source_doc: Optional[str]
+    ollama_host: Optional[str]
 
 def node_encode(state: QAState) -> QAState:
     """Embed the incoming question and attach the vector to state.
@@ -56,7 +57,11 @@ def node_generate(state: QAState) -> QAState:
     Returns:
         The updated state with the ``answer`` payload.
     """
-    state["answer"] = generator(state["question"], state["hits"])
+    state["answer"] = generator(
+        state["question"],
+        state["hits"],
+        host=state.get("ollama_host"),
+    )
     return state
 
 def node_rerank(state: QAState) -> QAState:
