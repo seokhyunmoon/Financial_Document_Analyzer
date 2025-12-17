@@ -69,8 +69,6 @@ def _build_messages(
         prompt["user"],
         section_title=chunk.get("section_title"),
         type=chunk.get("type"),
-        page_start=chunk.get("page_start"),
-        page_end=chunk.get("page_end"),
         text=text,
         max_keywords=max_keywords,
         summary_lines=summary_lines,
