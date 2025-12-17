@@ -64,6 +64,8 @@ def retrieve_topk(
             "section_title",
             "text",
             "text_as_html",
+            "summary",
+            "keywords",
             "page_start",
             "page_end",
         ]
@@ -109,6 +111,8 @@ def retrieve_topk(
                 "page_end":   props.get("page_end"),
                 "text":       props.get("text"),
                 "text_as_html": props.get("text_as_html"),
+                "summary":    props.get("summary"),
+                "keywords":   props.get("keywords"),
             })
         logger.info(
             f"[OK] Retrieved {len(hits)}/{topk} hits from '{collection_name}' mode={retriever_mode}"
