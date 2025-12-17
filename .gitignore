@@ -1,0 +1,10 @@
+.env
+.DS_Store
+.venv/
+__pycache__/
+*.pyc
+
+# Ignore all data artifacts except logs
+data/**
+!data/logs/
+!data/logs/**
