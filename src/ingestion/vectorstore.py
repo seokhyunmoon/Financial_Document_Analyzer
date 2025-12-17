@@ -144,6 +144,8 @@ def ensure_collection(client: weaviate.WeaviateClient, name: str) -> None:
         Property(name="section_title", data_type=DataType.TEXT),
         Property(name="text",          data_type=DataType.TEXT),
         Property(name="text_as_html",  data_type=DataType.TEXT),
+        Property(name="summary",       data_type=DataType.TEXT),
+        Property(name="keywords",      data_type=DataType.TEXT_ARRAY),
         Property(name="page_start",    data_type=DataType.INT),
         Property(name="page_end",      data_type=DataType.INT),
     ]
@@ -229,6 +231,8 @@ def upload_objects(
             "section_title": obj.get("section_title"),
             "text":         obj.get("text", ""),
             "text_as_html": obj.get("text_as_html"),
+            "summary":      obj.get("summary"),
+            "keywords":     obj.get("keywords"),
             "page_start":   obj.get("page_start"),
             "page_end":     obj.get("page_end"),
         }

@@ -4,10 +4,10 @@ Generate LLM metadata (summary and keywords) for one or more chunk files.
 
 Examples:
     # Enrich every *_chunks.jsonl under paths.chunks_dir
-    python cli/ingest2_5_metadata.py
+    python cli/ingest3_metadata.py
 
     # Enrich a single chunk file
-    python cli/ingest2_5_metadata.py --chunks data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl
+    python cli/ingest3_metadata.py --chunks data/processed/chunks/AMERICANEXPRESS_2022_10K_chunks.jsonl
 """
 
 import argparse

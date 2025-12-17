@@ -73,6 +73,7 @@ generate:
 
 # /src/ingestion/metadata.py
 metadata:
+  enabled: true
   provider: ollama
   model_name: qwen3:8b
   max_keywords: 6

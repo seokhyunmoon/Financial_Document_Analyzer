@@ -3,10 +3,10 @@
 
 Examples:
     # Upload every embedding file under paths.embed_dir
-    python cli/ingest4_vectorstore.py
+    python cli/ingest5_vectorstore.py
 
     # Upload a single embedding file
-    python cli/ingest4_vectorstore.py --embeddings data/processed/embeddings/AMEX.jsonl
+    python cli/ingest5_vectorstore.py --embeddings data/processed/embeddings/AMEX.jsonl
 """
 
 from __future__ import annotations

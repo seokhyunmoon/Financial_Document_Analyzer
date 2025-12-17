@@ -9,6 +9,7 @@ from utils.files import write_jsonl
 from ingestion.elements import extract_elements
 from ingestion.chunking import merge_elements_to_chunks
 from ingestion.embeddings import generate_embeddings
+from ingestion.metadata import enrich_chunks
 from ingestion.vectorstore import (
     init_client,
     close_client,
@@ -64,7 +65,7 @@ def _save_uploaded_to_local(uploaded: Union[Path, UploadedFile], raw_dir: Path) 
         return dest
 
 def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, Any]:
-    """Run full ingestion (elements → chunks → embeddings) for one PDF.
+    """Run full ingestion (elements → chunks → metadata → embeddings) for one PDF.
 
     Args:
         pdf_path: Location of the PDF to ingest.
@@ -87,8 +88,19 @@ def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, An
     c_out = out_dirs["chunks_dir"] / f"{doc_id}_chunks.jsonl"
     write_jsonl(str(c_out), chunks)
 
-    # 3) embeddings
-    embedded = generate_embeddings(chunks)
+    # 3) metadata (optional)
+    cfg = load_config()
+    msec = get_section(cfg, "metadata", {})
+    metadata_enabled = bool(msec.get("enabled", True))
+    enriched = chunks
+    meta_out = None
+    if metadata_enabled:
+        enriched = enrich_chunks(chunks)
+        meta_out = out_dirs["metadata_dir"] / f"{doc_id}_metadata.jsonl"
+        write_jsonl(str(meta_out), enriched)
+
+    # 4) embeddings
+    embedded = generate_embeddings(enriched)
     m_out = out_dirs["embeddings_dir"] / f"{doc_id}.jsonl"
     write_jsonl(str(m_out), embedded)
 
@@ -96,10 +108,16 @@ def ingest_single_pdf(pdf_path: Path, out_dirs: Dict[str, Path]) -> Dict[str, An
         "doc_id": doc_id,
         "n_elements": len(elements),
         "n_chunks": len(chunks),
+        "n_metadata": len(enriched) if metadata_enabled else 0,
         "n_vectors": len(embedded),
         "elapsed_sec": round(time.time() - t0, 2),
         "rows": embedded,
-        "paths": {"elements": e_out, "chunks": c_out, "embeddings": m_out},
+        "paths": {
+            "elements": e_out,
+            "chunks": c_out,
+            "metadata": meta_out,
+            "embeddings": m_out,
+        },
     }
     logger.info(
         f"[OK] Finished ingest for {doc_id}",
@@ -128,6 +146,7 @@ def ingest_files(
     out_dirs = {
         "elements_dir": Path(paths.get("elements_dir", "data/processed/elements")).resolve(),
         "chunks_dir":   Path(paths.get("chunks_dir", "data/processed/chunks")).resolve(),
+        "metadata_dir": Path(paths.get("metadata_dir", "data/processed/metadata")).resolve(),
         "embeddings_dir": Path(paths.get("embeddings_dir", "data/processed/embeddings")).resolve(),
     }
     

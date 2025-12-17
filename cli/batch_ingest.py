@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Batch-ingest PDFs into the vector store (elements → chunks → embeddings → upload).
+Batch-ingest PDFs into the vector store (elements → chunks → metadata → embeddings → upload).
 
 Examples:
     # Ingest every PDF under paths.raw_dir
