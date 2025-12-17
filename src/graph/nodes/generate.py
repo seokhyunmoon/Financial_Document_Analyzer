@@ -78,8 +78,8 @@ def _build_messages(question: str, topk: List[Dict[str, Any]]) -> List[Dict[str,
     for k in topk:
         text = (k.get("text") or "").strip()
         html = (k.get("text_as_html") or "").strip()
-        if k.get("type") == "table" and html:
-            body = html
+        if k.get("type") == "table":
+            body = text or html
         else:
             body = text
         if not body:

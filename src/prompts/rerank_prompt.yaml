@@ -6,6 +6,7 @@ system: |
   - section_title: the section or heading text from the document, grouped from consecutive title lines.
   - keywords: short key phrases extracted from the chunk text.
   - summary: a 2-3 sentence summary of the chunk text.
+  - excerpt: a short snippet from the chunk text (may include table markdown).
 
 user: |
   Question:

@@ -52,11 +52,11 @@ def _candidate_content(hit: Dict[str, Any], max_tokens: int) -> str:
     summary = (hit.get("summary") or "").strip()
     if summary:
         parts.append(f"summary: {summary}")
-    else:
-        text = (hit.get("text") or "").strip()
-        if text:
-            excerpt = _truncate_tokens(text, max_tokens)
-            parts.append(f"excerpt: {excerpt}")
+
+    text = (hit.get("text") or "").strip()
+    if text:
+        excerpt = _truncate_tokens(text, max_tokens)
+        parts.append(f"excerpt: {excerpt}")
 
     etype = (hit.get("type") or "").strip()
     if etype:
