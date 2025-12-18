@@ -20,7 +20,6 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Iterable, Dict, Any, List, Optional
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import sys
 
@@ -83,105 +82,6 @@ def iter_questions(dataset_path: Path, allowed_docs: Optional[Iterable[str]]):
             yield row
             count += 1
 
-
-def _normalize_hosts(raw: Any) -> List[str]:
-    """Normalize host inputs into a list of URLs."""
-    if not raw:
-        return []
-    if isinstance(raw, str):
-        return [raw] if raw.strip() else []
-    if isinstance(raw, list):
-        return [str(x).strip() for x in raw if str(x).strip()]
-    return []
-
-
-def _resolve_hosts(cfg: Dict[str, Any]) -> List[str]:
-    """Resolve Ollama hosts for batch eval with global fallback."""
-    batch_cfg = get_section(cfg, "batch_eval", {})
-    global_cfg = get_section(cfg, "ollama", {})
-    hosts = _normalize_hosts(batch_cfg.get("ollama_hosts"))
-    if not hosts:
-        hosts = _normalize_hosts(global_cfg.get("hosts"))
-    return hosts
-
-
-def _process_row(
-    index: int,
-    row: Dict[str, Any],
-    app,
-    topk: int,
-    host: Optional[str],
-) -> tuple[int, Dict[str, Any], bool]:
-    """Run retrieve/generate/evaluate for a single row."""
-    doc_name = str(row.get("doc_name", "")).strip()
-    question_type = row.get("question_type")
-    question = str(row.get("question", "")).strip()
-    ground_truth = str(row.get("answer", "")).strip()
-    evidences = row.get("evidence") or []
-    evidence_items = [
-        {
-            "evidence_text": ev.get("evidence_text"),
-            "evidence_page_num": ev.get("evidence_page_num"),
-        }
-        for ev in evidences
-        if isinstance(ev, dict)
-    ]
-
-    record: Dict[str, Any] = {
-        "doc_name": doc_name,
-        "question_type": question_type,
-        "question": question,
-        "ground_truth": ground_truth,
-        "evidence": evidence_items,
-    }
-
-    try:
-        state: Dict[str, Any] = {
-            "question": question,
-            "topk": topk,
-            "source_doc": doc_name,
-        }
-        if host:
-            state["ollama_host"] = host
-
-        result = app.invoke(state)
-        answer_block = result.get("answer", {}) or {}
-        hits: List[Dict[str, Any]] = result.get("hits", []) or []
-        model_answer = answer_block.get("answer", "")
-        citations = answer_block.get("citations") or []
-
-        eval_result = qa_evaluate(
-            question=question,
-            ground_truth=ground_truth,
-            generated_answer=model_answer,
-            host=host,
-        )
-        classification = eval_result.get("classification")
-        reasoning = eval_result.get("reasoning")
-
-        record.update(
-            {
-                "answer": model_answer,
-                "citations": citations,
-                "hits": hits,
-                "eval_classification": classification,
-                "reasoning": reasoning,
-            }
-        )
-        return index, record, False
-    except Exception as exc:
-        record.update(
-            {
-                "answer": "",
-                "citations": [],
-                "hits": [],
-                "eval_classification": "ERROR",
-                "error": str(exc),
-                "reasoning": "",
-            }
-        )
-        return index, record, True
-
 def main() -> None:
     """Execute batch QA + evaluation against FinanceBench."""
     args = parse_args()
@@ -228,49 +128,78 @@ def main() -> None:
     logger.info("Building LangGraph (QA)...")
     app = build_graph()
 
-    rows = list(iter_questions(dataset_path, docs))
-    if not rows:
-        logger.warning("[WARN] No questions to evaluate.")
-        return
-
-    batch_cfg = get_section(cfg, "batch_eval", {})
-    max_workers = int(batch_cfg.get("max_workers", 1))
-    hosts = _resolve_hosts(cfg)
-
     processed = 0
     errors = 0
-    results: List[tuple[int, Dict[str, Any], bool]] = []
 
-    if max_workers <= 1:
-        for idx, row in enumerate(rows):
-            host = hosts[idx % len(hosts)] if hosts else None
-            _, record, is_error = _process_row(idx, row, app, topk, host)
-            processed += 1
-            errors += 1 if is_error else 0
-            results.append((idx, record, is_error))
-    else:
-        max_workers = max(1, min(max_workers, len(rows)))
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = {
-                executor.submit(
-                    _process_row,
-                    idx,
-                    row,
-                    app,
-                    topk,
-                    hosts[idx % len(hosts)] if hosts else None,
-                ): idx
-                for idx, row in enumerate(rows)
-            }
-            for fut in as_completed(futures):
-                idx, record, is_error = fut.result()
-                processed += 1
-                errors += 1 if is_error else 0
-                results.append((idx, record, is_error))
-
-    results.sort(key=lambda item: item[0])
     with out_path.open("w", encoding="utf-8") as out_f:
-        for _, record, _ in results:
+        for row in iter_questions(dataset_path, docs):
+            doc_name = str(row.get("doc_name", "")).strip()
+            question_type = row.get("question_type")
+            question = str(row.get("question", "")).strip()
+            ground_truth = str(row.get("answer", "")).strip()
+            evidences = row.get("evidence") or []
+            evidence_items = [
+                {
+                    "evidence_text": ev.get("evidence_text"),
+                    "evidence_page_num": ev.get("evidence_page_num"),
+                }
+                for ev in evidences
+                if isinstance(ev, dict)
+            ]
+            
+            processed += 1
+            logger.info("[%s] Q%d: %s", doc_name, processed, question[:120])
+            record: Dict[str, Any] = {
+                "doc_name": doc_name,
+                "question_type": question_type,
+                "question": question,
+                "ground_truth": ground_truth,
+                "evidence": evidence_items,
+            }
+            try:
+                result = app.invoke(
+                    {
+                        "question": question,
+                        "topk": topk,
+                        "source_doc": doc_name,
+                    }
+                )
+                answer_block = result.get("answer", {}) or {}
+                hits: List[Dict[str, Any]] = result.get("hits", []) or []
+                model_answer = answer_block.get("answer", "")
+                citations = answer_block.get("citations") or []
+
+                eval_result = qa_evaluate(
+                    question=question,
+                    ground_truth=ground_truth,
+                    generated_answer=model_answer,
+                )
+                classification = eval_result.get("classification")
+                reasoning = eval_result.get("reasoning")
+
+                record.update(
+                    {
+                        "answer": model_answer,
+                        "citations": citations,
+                        "hits": hits,
+                        "eval_classification": classification,
+                        "reasoning": reasoning,
+                    }
+                )
+            except Exception as exc:
+                errors += 1
+                logger.exception("Failed to process question %s", question[:80])
+                record.update(
+                    {
+                        "answer": "",
+                        "citations": [],
+                        "hits": [],
+                        "eval_classification": "ERROR",
+                        "error": str(exc),
+                        "reasoning": "",
+                    }
+                )
+
             out_f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     logger.info(

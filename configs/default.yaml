@@ -39,7 +39,6 @@ metadata:
   max_workers: 4
   retry: 3
 
-
 # src/ingestion/embeddings.py
 embedding:
   model_name: Qwen/Qwen3-Embedding-8B
@@ -60,7 +59,7 @@ vectordb:
     env:
       LOG_LEVEL: error
   upload:
-    batch_size: 100
+    batch_size: 128
     concurrent_requests: 4
     upsert: true
 
@@ -74,25 +73,30 @@ generate:
 ollama:
   hosts:
     - http://127.0.0.1:11435
-    - http://127.0.0.1:11436
-    - http://127.0.0.1:11437
-    - http://127.0.0.1:11438
+    # - http://127.0.0.1:11436
+    # - http://127.0.0.1:11437
+    # - http://127.0.0.1:11438
 
 # /src/graph/nodes/retrieve.py
 qa:
   topk: 10
-  retriever_mode: vector #vector, keyword, hybrid
+  retriever_mode: fusion # vector | keyword | hybrid | fusion (vector+bm25 merged)
   hybrid_alpha: 0.9
   keyword_properties:
     - text
     - section_title
+    - keywords
+  vector_topk: 20
+  keyword_topk: 20
+  merge_topk: 10
+  rrf_k: 60.0
 
 # /src/graph/nodes/rerank.py
 rerank:
-  enabled: false
+  enabled: true
   model_name: qwen3:8b
   topk: 10
-  max_candidates: 5
+  max_candidates: 10
   max_tokens: 128
   # think: true
 
@@ -101,8 +105,3 @@ evaluate:
   provider: ollama
   model_name: gpt-oss:20b
   # think: high
-
-# /cli/batch_eval.py
-batch_eval:
-  max_workers: 2
-  ollama_hosts: []
