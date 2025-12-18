@@ -7,6 +7,7 @@ This module defines nodes for querying embeddings in the graph.
 
 from typing import List
 from functools import lru_cache
+import threading
 from sentence_transformers import SentenceTransformer
 from torch import cuda
 import numpy as np
@@ -14,6 +15,7 @@ from utils.logger import get_logger
 from utils.config import load_config, get_section
 
 logger = get_logger(__name__)
+_MODEL_LOCK = threading.Lock()
 
 @lru_cache(maxsize=1)
 def _get_model(model_name: str) -> SentenceTransformer:
@@ -29,11 +31,13 @@ def _get_model(model_name: str) -> SentenceTransformer:
     # Load configuration
     device = "cuda" if cuda.is_available() else "cpu"
     
-    try:
-        model = SentenceTransformer(model_name, device=device)
-        return model
-    except Exception as e:
-        raise
+    # Guard first load to avoid parallel reloads under concurrency
+    with _MODEL_LOCK:
+        try:
+            model = SentenceTransformer(model_name, device=device)
+            return model
+        except Exception as e:
+            raise
 
 def query_embeddings(question: str) -> List[float]:
     """Generate an embedding for a query string.
