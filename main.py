@@ -11,10 +11,16 @@ from graph.state import compiled_graph, QAState
 from utils.inventory import list_available_documents
 from services.ingest import ingest_files
 from utils.logger import get_logger
+from utils.config import load_config, get_section
 
 logger = get_logger(__name__)
 
 st.set_page_config(page_title="Financial Document Analyzer", page_icon="💵", layout="wide")
+
+# Load QA defaults from config
+cfg = load_config()
+retrieve_cfg = get_section(cfg, "retrieve")
+default_topk = int(retrieve_cfg.get("topk", 10))
 
 # --- Session State Initialization ---
 if "messages" not in st.session_state:
@@ -59,7 +65,11 @@ if prompt := st.chat_input("Send a message..."):
     # Assistant response
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            inputs = QAState(question=prompt.strip(), topk=10, source_doc=source_doc_filter)
+            inputs = QAState(
+                question=prompt.strip(),
+                topk=default_topk,
+                source_doc=source_doc_filter,
+            )
             logger.info(
                 "[INFO] Invoking QA graph",
                 extra={"question_len": len(prompt.strip()), "source_filter": source_doc_filter or "ALL"},

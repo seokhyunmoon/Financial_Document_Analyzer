@@ -78,7 +78,7 @@ ollama:
     # - http://127.0.0.1:11438
 
 # /src/graph/nodes/retrieve.py
-qa:
+retrieve:
   topk: 10
   retriever_mode: fusion # vector | keyword | hybrid | fusion (vector+bm25 merged)
   hybrid_alpha: 0.9
@@ -86,10 +86,11 @@ qa:
     - text
     - section_title
     - keywords
-  vector_topk: 20
-  keyword_topk: 20
-  merge_topk: 10
-  rrf_k: 60.0
+  fusion:
+    vector_topk: 20
+    keyword_topk: 20
+    merge_topk: 10
+    rrf_k: 60.0
 
 # /src/graph/nodes/rerank.py
 rerank:

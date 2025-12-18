@@ -89,16 +89,17 @@ def retrieve_topk(
         List of chunk dictionaries containing text and metadata.
     """
     cfg = load_config()
-    qsec = get_section(cfg, "qa")
+    qsec = get_section(cfg, "retrieve")
     vsec = get_section(cfg, "vectordb")
     topk = topk or qsec.get("topk", 10)
     retriever_mode = (mode or qsec.get("retriever_mode", "vector")).lower()
     hybrid_alpha = float(qsec.get("hybrid_alpha", 0.5))
     keyword_props = qsec.get("keyword_properties", ["text", "section_title"])
-    vector_topk = int(qsec.get("vector_topk", topk))
-    keyword_topk = int(qsec.get("keyword_topk", topk))
-    merge_topk = int(qsec.get("merge_topk", topk))
-    rrf_k = float(qsec.get("rrf_k", 60.0))
+    fusion_cfg = qsec.get("fusion", {}) or {}
+    vector_topk = int(fusion_cfg.get("vector_topk", qsec.get("vector_topk", topk)))
+    keyword_topk = int(fusion_cfg.get("keyword_topk", qsec.get("keyword_topk", topk)))
+    merge_topk = int(fusion_cfg.get("merge_topk", qsec.get("merge_topk", topk)))
+    rrf_k = float(fusion_cfg.get("rrf_k", qsec.get("rrf_k", 60.0)))
     collection_name = vsec.get("collection_name", "FinancialDocChunk")
 
     needs_vector = retriever_mode in ("vector", "hybrid")

@@ -86,8 +86,8 @@ def main() -> None:
     """Execute batch QA + evaluation against FinanceBench."""
     args = parse_args()
     cfg = load_config()
-    qa_cfg = get_section(cfg, "qa")
-    topk = int(qa_cfg.get("topk", 10))
+    retrieve_cfg = get_section(cfg, "retrieve")
+    topk = int(retrieve_cfg.get("topk", 10))
     paths = cfg.get("paths", {})
     dataset_path = Path(paths.get("financebench_dir", "data/financebench")) / "financebench_open_source.jsonl"
     if not dataset_path.exists():
